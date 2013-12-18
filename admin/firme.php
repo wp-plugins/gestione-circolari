@@ -4,7 +4,7 @@ Plugin Name:Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa le seguenti funzionalità per la gestione della scuola
 	- Circolari
-Version:0.01
+Version:0.1
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 */
@@ -83,7 +83,11 @@ foreach($Posts as $post){
 			echo "
 					<tr>
 						<td> ".GetNumeroCircolare($post->ID)."</td>
-						<td>$post->post_title</td>
+						<td>
+						<a href='".get_permalink( $post->ID )."'>
+						$post->post_title
+						</a>
+						</td>
 						<td>$TipoCircolare</td>
 						<td>$Campo_Firma</td>
 						<td>$dati_firma->datafirma</td>

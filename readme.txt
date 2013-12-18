@@ -4,7 +4,7 @@ Donate link: www.sisviluppo.info
 Tags: Albo Pretorio, Codice Amministrazione Digitale, Upload File
 Requires at least: 3.7
 Tested up to: 3.5
-Stable tag: 0.01
+Stable tag: 0.1
 Gestione Circolari
 License: GPLv2 or later
 == Description ==

@@ -3,7 +3,7 @@
 Plugin Name:Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa le seguenti funzionalità per la gestione della scuola
-Version:0.01
+Version:0.1
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -62,8 +62,24 @@ add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
 add_action( 'admin_menu', 'add_circolari_menu_bubble' );
 register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
+add_filter( 'the_content', 'vis_firma');
 //register_deactivation_hook( __FILE__, 'deactivate') );	
 
+function vis_firma( $content ){
+	if (get_post_type( get_the_ID()) =="circolari" And strlen(stristr($_SERVER["HTTP_REFERER"],"wp-admin/edit.php?post_type=circolari&page=Firma"))>0)
+		return "<br />
+		<button style=' outline: none;
+ cursor: pointer;
+ text-align: center;
+ text-decoration: none;
+ font: bold 12px Arial, Helvetica, sans-serif;
+ color: #fff;
+ padding: 10px 20px;
+ border: solid 1px #0076a3;
+ background: #0095cd;' onclick='javascript:history.back()'>Torna alla Firma</button>".$content;
+	else
+		return $content;
+}
 function circolari_activate() {
 	global $wpdb;
 	if(get_option('Circolari_Visibilita_Pubblica')== ''||!get_option('Circolari_Visibilita_Pubblica')){
@@ -259,7 +275,7 @@ function circolari_admin_bar_render() {
 	$wp_admin_bar->add_menu( array(
 		'id' => 'fc', // link ID, defaults to a sanitized title value
 		'title' => 'Circolari '.$VisNumCircolari, // link title
-		'href' => 'edit.php?post_type=circolari&page=Firma', // name of file
+		'href' => home_url().'/wp-admin/edit.php?post_type=circolari&page=Firma', // name of file
 		'meta' => array(  'title' => 'Circolari da Firmare' )));
 }
 
