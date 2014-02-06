@@ -22,8 +22,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 2. Attivare il plugin dal menu Plugins
 3. Creare i gruppidi utenti es. Docenti, ATA, Tutti, etc....
 4. Impostare i Parametri:
-	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilit&agrave; delle corcolari nella gestione della presa visione 
-	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
+<br />	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilit&agrave; delle corcolari nella gestione della presa visione 
+<br />	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
 5. Inserire le circolari, selezionando i destinatari nella finestra dei destinatari, il numero progressivo se diverso da quello proposto, selezionare l'eventuale richiesta di firma, selezionare l'eventuale indicazione di circolare per sciopero 
 6. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione.
 
