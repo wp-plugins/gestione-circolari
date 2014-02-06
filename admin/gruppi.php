@@ -1,13 +1,13 @@
 <?php
-/*
-Plugin Name:Circolari
-Plugin URI: http://www.sisviluppo.info
-Description: Plugin che implementa le seguenti funzionalità per la gestione della scuola
-	- Circolari
-Version:0.1
-Author: Scimone Ignazio
-Author URI: http://www.sisviluppo.info
-*/
+/**
+ * Gestione Circolari - Funzioni Gestione Gruppi
+ * 
+ * @package Gestione Circolari
+ * @author Scimone Ignazio
+ * @copyright 2011-2014
+ * @ver 0.1
+ */
+ 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
   die('You are not allowed to call this page directly.'); 
 }
@@ -66,7 +66,8 @@ function gruppi_add_user_columns( $defaults ) {
 }
 function gruppi_add_custom_user_columns($value, $column_name, $id) {
       if( $column_name == 'gruppo' ) {
-	  	$IDGruppo[]=get_the_author_meta( 'gruppo', $id );
+	  	
+	  	$IDGruppo[]=get_the_author_meta( 'gruppo', $id )." ".$id;
 		$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => 0,'include'=>$IDGruppo));
 		return $gruppiutenti[0]->name;
       }

@@ -1,17 +1,21 @@
 <?php
-/*
-Plugin Name:Circolari
-Plugin URI: http://www.sisviluppo.info
-Description: Plugin che implementa le seguenti funzionalità per la gestione della scuola
-	- Circolari
-Version:0.1
-Author: Scimone Ignazio
-Author URI: http://www.sisviluppo.info
-*/
+/**
+ * Gestione Circolari - Funzioni libreia generale
+ * 
+ * @package Gestione Circolari
+ * @author Scimone Ignazio
+ * @copyright 2011-2014
+ * @ver 0.1
+ */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
 
-
+function FormatDataItaliano($Data){
+	$mesi = array('', 'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio',  'Agosto', 'Settembre', 'Ottobre', 'Novembre','Dicembre');
+	$giorni = array('Domenica','Lunedì','Martedì', 'Mercoledì', 'Giovedì', 'Venerdì','Sabato');
+	list($anno,$mese,$giorno) = explode('-',substr($Data,0,10)); 
+	return $giorno.' '.substr($mesi[intval($mese)],0,3).' '.$anno;
+}
 function GetNumeroCircolare($PostID){
 	$numero=get_post_meta($PostID, "_numero");
 	$numero=$numero[0];
@@ -146,5 +150,77 @@ function Get_Numero_Firme_Per_Circolare($IDCircolare){
 	return $wpdb->get_var($wpdb->prepare(
 			"Select count(*) FROM $wpdb->table_firme_circolari WHERE post_ID=%d",
 			$IDCircolare));
+}
+function Circolari_ElencoAnniMesi($urlCircolari){
+
+global $wpdb,$table_prefix;
+$Circolari=get_option('Circolari_Categoria');
+$PaginaCircolari=get_option('Circolari_Categoria');
+$Ritorno="<ul>
+";
+//echo $tipo."  ".$Categoria."  ".$Anno;
+$mesi = array("","Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre","Novembre", "Dicembre");
+
+	$Sql='SELECT year('.$table_prefix.'posts.post_date) as anno  
+		FROM '.$table_prefix.'posts JOIN '.$table_prefix.'term_relationships ON '.$table_prefix.'posts.ID = '.$table_prefix.'term_relationships.object_id
+                                    JOIN '.$table_prefix.'term_taxonomy ON '.$table_prefix.'term_taxonomy.term_taxonomy_id = '.$table_prefix.'term_relationships.term_taxonomy_id
+		WHERE post_type IN ("post","circolari") and post_status="publish" and '.$table_prefix.'term_taxonomy.term_id='.$Circolari.' 
+		group by year('.$table_prefix.'posts.post_date)
+		order by year('.$table_prefix.'posts.post_date) DESC;';
+
+
+	$Anni=$wpdb->get_results($Sql,ARRAY_A );
+
+		foreach( $Anni as $Anno){
+			$SqlMese='
+SELECT month('.$table_prefix.'posts.post_date) as mese  
+FROM '.$table_prefix.'posts JOIN '.$table_prefix.'term_relationships ON '.$table_prefix.'posts.ID = '.$table_prefix.'term_relationships.object_id
+                            JOIN '.$table_prefix.'term_taxonomy ON '.$table_prefix.'term_taxonomy.term_taxonomy_id = '.$table_prefix.'term_relationships.term_taxonomy_id
+WHERE post_type IN ("post","circolari") and post_status="publish" 
+	and '.$table_prefix.'term_taxonomy.term_id='.$Circolari.'
+	and year('.$table_prefix.'posts.post_date)='.$Anno["anno"].' 
+group by month('.$table_prefix.'posts.post_date)
+order by month('.$table_prefix.'posts.post_date) DESC;';
+
+			$Ritorno.='<li><a href="'.$urlCircolari.'?Anno='.$Anno["anno"].'" title="link agli articoli dell\'anno '.$Anno["anno"].'">'.$Anno["anno"].'</a></li>';
+	
+			$Mesi=$wpdb->get_results($SqlMese,ARRAY_A );
+			foreach( $Mesi as $Mese){
+				$Ritorno.='<li style="margin-left:10px;"><a href="'.$urlCircolari.'?Anno='.$Anno["anno"].'&Mese='.$Mese['mese'].'" title="link agli articoli dell\'anno '.$Anno["anno"].' Mese '.$Mese['mese'].'">'.$mesi[$Mese['mese']].'</a></li>';
+			}
+		}
+/*
+}else{
+
+	$Sql='SELECT year('.$table_prefix.'posts.post_date) as anno  , month('.$table_prefix.'posts.post_date) as mese
+
+		FROM '.$table_prefix.'posts JOIN '.$table_prefix.'term_relationships ON '.$table_prefix.'posts.ID = '.$table_prefix.'term_relationships.object_id
+
+                   JOIN '.$table_prefix.'term_taxonomy ON '.$table_prefix.'term_taxonomy.term_taxonomy_id = '.$table_prefix.'term_relationships.term_taxonomy_id
+
+		WHERE post_type="post" and post_status="publish" and '.$table_prefix.'term_taxonomy.term_id='.$Categoria.' And year('.$table_prefix.'posts.post_date)='.$Anno.' 
+
+		group by year('.$table_prefix.'posts.post_date), month('.$table_prefix.'posts.post_date)
+
+		order by year('.$table_prefix.'posts.post_date) DESC, month('.$table_prefix.'posts.post_date) DESC;';
+
+	$AnniMesi=$wpdb->get_results($Sql,ARRAY_A );
+
+		foreach( $AnniMesi as $AnnoMese){
+
+			$Mese=$AnnoMese["mese"];
+
+			$Ritorno.='<li><a href="'.home_url().'/'.$AnnoMese["anno"].'/'.$Mese.'/?catid='.$Categoria.'" title="link agli articoli di '.$mesi[$Mese-1].' del '.$AnnoMese["anno"].'">'.$mesi[$AnnoMese["mese"]-1].' '.$AnnoMese["anno"].'</a></li>
+
+				';
+
+		}
+
+}
+*/
+//echo $Sql;	
+$Ritorno.="</ul>";
+return $Ritorno;
+
 }
 ?>
