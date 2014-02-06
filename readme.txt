@@ -3,15 +3,17 @@ Contributors: Scimone Ignazio
 Donate link: www.sisviluppo.info
 Tags: Albo Pretorio, Codice Amministrazione Digitale, Upload File
 Requires at least: 3.7
-Tested up to: 3.5
-Stable tag: 0.1
-Gestione Circolari
+Tested up to: 3.8
 License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+Gestione Circolari Scolastiche. 
+
 == Description ==
 
 Gestione delle circolari scolastiche con la possibilità di richiedere la firma e l'adesione alle circolari sindacali
 
-== Installazione ==
+== Installation ==
 
 Di seguito sono riportati i passi necessari per l'installazione del plugin. la procedura dettagliata la potete trovare sul sito dedicato al plugin http://www.sisviluppo.info
 
@@ -24,6 +26,7 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin. la p
 	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
 5. Inserire le circolari, selezionando i destinatari nella finestra dei destinatari, il numero progressivo se diverso da quello proposto, selezionare l'eventuale richiesta di firma, selezionare l'eventuale indicazione di circolare per sciopero 
 6. inserire il widget che indica, se l'utente è loggato il numero di circolari da firmare o da prendere in visione.
+
 == Screenshots ==
 
 1. Elenco Circolari
@@ -31,6 +34,7 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin. la p
 3. Finestra di gestione delle circolari da firmare
 4. Finestra associata ad ogni circolare per la verifica delle firme/adesioni
 5. Finestra lato pubblico con i due widget; Circolari, che riporta il numero di circolari da visionare/firmare. Navigazione Circolari, che implementa il sistema di navigazione per Anno/mese delle circolari
+
 == Changelog ==
 
 = 0.1 =
