@@ -11,21 +11,21 @@ Gestione Circolari Scolastiche.
 
 == Description ==
 
-Gestione delle circolari scolastiche con la possibilità di richiedere la firma e l'adesione alle circolari sindacali
+Gestione delle circolari scolastiche con la possibilit&agrave; di richiedere la firma e l'adesione alle circolari sindacali
 
 == Installation ==
 
-Di seguito sono riportati i passi necessari per l'installazione del plugin. la procedura dettagliata la potete trovare sul sito dedicato al plugin http://www.sisviluppo.info
+Di seguito sono riportati i passi necessari per l'installazione del plugin.
 
 
 1. Scaricare il plugin dal repository di wordpress o dal sito di riferimento
 2. Attivare il plugin dal menu Plugins
 3. Creare i gruppidi utenti es. Docenti, ATA, Tutti, etc....
 4. Impostare i Parametri:
-	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilità delle corcolari nella gestione della presa visione 
+	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilit&agrave; delle corcolari nella gestione della presa visione 
 	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
 5. Inserire le circolari, selezionando i destinatari nella finestra dei destinatari, il numero progressivo se diverso da quello proposto, selezionare l'eventuale richiesta di firma, selezionare l'eventuale indicazione di circolare per sciopero 
-6. inserire il widget che indica, se l'utente è loggato il numero di circolari da firmare o da prendere in visione.
+6. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione.
 
 == Screenshots ==
 
@@ -46,7 +46,7 @@ Aggiornare sempre il plugin all'ultima versione fino a che non si arriva ad una 
 
 == Note ==
 Versione in fase di test 
-Da utilizzare tenendo in considerazione che potrebbero essere presenti errori e malfunzionamenti. Per segnalare errori o problemi di utilizzo usare l'indirizzo email ignazio.scimone@gmail.com segnalando il sito in cui e' installato il plugin, una breve descrizione del problema riscontrato, la persona di riferimento con indirizzo email.
+Da utilizzare tenendo in considerazione che potrebbero essere presenti errori e malfunzionamenti. Per segnalare errori o problemi di utilizzo usare l'indirizzo email ignazio.scimone@gmail.com segnalando il sito in cui &egrave; installato il plugin, una breve descrizione del problema riscontrato, la persona di riferimento con indirizzo email.
 Non prendo in considerazione richieste non corredate da tutti i dati sopraelencati. 
 == Uso ==
 
