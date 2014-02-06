@@ -1,4 +1,4 @@
-=== Plugin Name ===
+=== Gestione Circolari ===
 Contributors: Scimone Ignazio
 Donate link: www.sisviluppo.info
 Tags: Albo Pretorio, Codice Amministrazione Digitale, Upload File
