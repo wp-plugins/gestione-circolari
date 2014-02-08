@@ -1,7 +1,7 @@
 === Gestione Circolari ===
 Contributors: Scimone Ignazio
 Donate link: www.sisviluppo.info
-Tags: Albo Pretorio, Codice Amministrazione Digitale, Upload File
+Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 3.8
 Stable tag: 0.2
@@ -21,7 +21,7 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 
 1. Scaricare il plugin dal repository di wordpress o dal sito di riferimento
 2. Attivare il plugin dal menu Plugins
-3. Creare i gruppidi utenti es. Docenti, ATA, Tutti, etc....
+3. Creare i gruppi di utenti es. Docenti, ATA, Tutti, etc....
 4. Impostare i Parametri:
 <br />	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilit&agrave; delle corcolari nella gestione della presa visione 
 <br />	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
@@ -56,5 +56,4 @@ Aggiornare sempre il plugin all'ultima versione fino a che non si arriva ad una 
 Versione in fase di test 
 Da utilizzare tenendo in considerazione che potrebbero essere presenti errori e malfunzionamenti. Per segnalare errori o problemi di utilizzo usare l'indirizzo email ignazio.scimone@gmail.com segnalando il sito in cui &egrave; installato il plugin, una breve descrizione del problema riscontrato, la persona di riferimento con indirizzo email.
 Non prendo in considerazione richieste non corredate da tutti i dati sopraelencati. 
-== Uso ==
 
