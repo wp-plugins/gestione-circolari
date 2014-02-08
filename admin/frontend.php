@@ -5,10 +5,11 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 0.1
+ * @since 0.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
+
 if (isset($_REQUEST['anno']))
 	$Anno=$_REQUEST['anno'];
 else
@@ -17,7 +18,6 @@ $Mese=0;
 if (isset($_REQUEST['mese']))
 	$Mese=$_REQUEST['mese'];
 $ret=Lista_Circolari($Anno,$Mese);
-
 
 function Lista_Circolari($Anno,$Mese){
 $Contenuto="";

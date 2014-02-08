@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 0.1
+ * @ver 0.2
  */
  
 function circolari_GestioneFirme()

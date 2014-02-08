@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 0.1
+ * @ver 0.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -60,14 +60,15 @@ public function widget( $args, $instance )
     {
  		global $post;
  	    extract( $args );
-		if (get_permalink($post->ID)!=$instance['pagina_circolari'])
+		$CurPage='http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+		if (substr($CurPage,0,strlen($instance['pagina_circolari']))!=$instance['pagina_circolari'])
 			return;
         $titolo = apply_filters('widget_title', $instance['titolo'] );
 		if ($titolo=='')
 			$titolo="Circolari";
 		echo $before_widget;
         echo $before_title .$titolo. $after_title;
-		echo Circolari_ElencoAnniMesi(get_permalink($post->ID));
+		echo Circolari_ElencoAnniMesi($instance['pagina_circolari']);
  	   echo $after_widget;
     }
 

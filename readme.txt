@@ -4,6 +4,7 @@ Donate link: www.sisviluppo.info
 Tags: Albo Pretorio, Codice Amministrazione Digitale, Upload File
 Requires at least: 3.7
 Tested up to: 3.8
+Stable tag: 0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +26,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 <br />	4.1 <strong>Gruppo Pubblico Circolari</strong>; in genere Tutti, indica la visibilit&agrave; delle corcolari nella gestione della presa visione 
 <br />	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
 5. Inserire le circolari, selezionando i destinatari nella finestra dei destinatari, il numero progressivo se diverso da quello proposto, selezionare l'eventuale richiesta di firma, selezionare l'eventuale indicazione di circolare per sciopero 
-6. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione.
+6. Creare una pagina con lo shortcode [VisCircolari] e collegarla ad una voce di menu
+7. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione.
 
 == Screenshots ==
 
@@ -37,6 +39,9 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 
 == Changelog ==
 
+= 0.2 =
+- <strong>Inserito</strong> lo shortcode da inserire nella pagina che elenca le circolari
+- <strong>Sistemati</strong> bugs vari
 = 0.1 =
 - <strong>Seconda versione</strong>
 = 0.01 =

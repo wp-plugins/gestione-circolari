@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:0.1
+Version:0.2
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -65,7 +65,7 @@ add_action( 'admin_menu', 'add_circolari_menu_bubble' );
 register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
 add_filter( 'the_content', 'vis_firma');
-add_shortcode('Circolari', 'VisualizzaCircolari');
+add_shortcode('VisCircolari', 'VisualizzaCircolari');
 /*register_deactivation_hook( __FILE__, 'deactivate') );	
 //add_filter( 'posts_where' , 'posts_where' );
 function my_posts_request_filter( $input ) {
@@ -88,13 +88,21 @@ function posts_where( $where ) {
 }
 */
 
-function VisualizzaCircolari($Parametri){
+function VisualizzaCircolari(){
 	require_once ( dirname (__FILE__) . '/admin/frontend.php' );
 return $ret;
+
+
 }
 
 function vis_firma( $content ){
-	if (get_post_type( get_the_ID()) =="circolari" And strlen(stristr($_SERVER["HTTP_REFERER"],"wp-admin/edit.php?post_type=circolari&page=Firma"))>0)
+	$PostID= get_the_ID();
+	$Campo_Firma="";
+	if (get_post_type( $PostID) !="circolari")
+		return $content;
+	if (!is_user_logged_in())
+		return $content;
+	if (strlen(stristr($_SERVER["HTTP_REFERER"],"wp-admin/edit.php?post_type=circolari&page=Firma"))>0)
 		return "<br />
 		<button style=' outline: none;
  cursor: pointer;
@@ -105,8 +113,51 @@ function vis_firma( $content ){
  padding: 10px 20px;
  border: solid 1px #0076a3;
  background: #0095cd;' onclick='javascript:history.back()'>Torna alla Firma</button>".$content;
-	else
-		return $content;
+	else{
+		$Adesione=get_post_meta($PostID, "_sciopero");
+		if (Is_Circolare_per_User($PostID)){
+			$TipoCircolare="Circolare";
+			$Campo_Firma_Adesione="";
+			if ($Adesione[0]=="Si"){			
+				$TipoCircolare="Circolare con Adesione";
+				switch (get_Circolare_Adesione($PostID)){
+				case 1:
+					$Campo_Firma_Adesione=": adesione Si";
+					break;
+				case 2:
+					$Campo_Firma_Adesione=": adesione No";		
+					break;
+				case 3:
+					$Campo_Firma_Adesione=": adesione Presa Visione";				
+					break;
+				}
+			}	
+			$firma=get_post_meta($PostID, "_firma");
+			$BaseUrl=admin_url()."edit.php";
+			if($firma[0]=="Si"){
+				if (Is_Circolare_Firmata($PostID)){
+					$Campo_Firma="Firmata".$Campo_Firma_Adesione;
+				}
+				else{
+					if ($Adesione[0]=="Si"){			
+						$Campo_Firma='<form action="'.$BaseUrl.'" id="adesione" method="get" style="display:inline;">
+							<input type="hidden" name="post_type" value="circolari" />
+							<input type="hidden" name="page" value="Firma" />
+							<input type="hidden" name="op" value="Adesione" />
+							<input type="hidden" name="pid" value="'.$PostID.'" />
+							<input type="radio" name="scelta" value="1"/>Si 
+							<input type="radio" name="scelta" value="2"/>No 
+							<input type="radio" name="scelta" value="3"/>Presa Visione
+							<input type="submit" name="invia" id="invia" class="button" value="Firma"/>
+						</form>';
+					}else
+						$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$PostID.'">Firma Circolare</a>';
+				}
+				$dati_firma=get_Firma_Circolare($PostID);
+			}	
+		}
+		return $content." <br /><div style='border: solid 1px #0076a3; background: #c6d7f2;padding: 5px;'>".$Campo_Firma."</div>";
+	}
 }
 function circolari_activate() {
 	global $wpdb;
