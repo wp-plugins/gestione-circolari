@@ -36,6 +36,9 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 3. Finestra di gestione delle circolari da firmare
 4. Finestra associata ad ogni circolare per la verifica delle firme/adesioni
 5. Finestra lato pubblico con i due widget; Circolari, che riporta il numero di circolari da visionare/firmare. Navigazione Circolari, che implementa il sistema di navigazione per Anno/mese delle circolari
+6. Creazione della pagina che conterrà le circolari
+7. Pagina con l'elenco delle circolari
+8. Visualizzazione di una circolare
 
 == Changelog ==
 
