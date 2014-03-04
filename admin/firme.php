@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 0.2
+ * @ver 1.0
  */
  
 function circolari_GestioneFirme()
@@ -58,26 +58,26 @@ foreach($Posts as $post){
 		}	
 		$firma=get_post_meta($post->ID, "_firma");
 		$BaseUrl=admin_url()."edit.php";
+		setup_postdata($post);
 		if($firma[0]=="Si"){
 			if (Is_Circolare_Firmata($post->ID)){
 				$Campo_Firma="Firmata".$Campo_Firma_Adesione;
 			}
 			else{
 				if ($Adesione[0]=="Si"){			
-					$Campo_Firma='<form action="'.$BaseUrl.'" id="adesione" method="get" style="display:inline;">
+					$Campo_Firma='<form action="'.$BaseUrl.'"  method="get" style="display:inline;">
 						<input type="hidden" name="post_type" value="circolari" />
 						<input type="hidden" name="page" value="Firma" />
 						<input type="hidden" name="op" value="Adesione" />
 						<input type="hidden" name="pid" value="'.$post->ID.'" />
-						<input type="radio" name="scelta" value="1"/>Si 
-						<input type="radio" name="scelta" value="2"/>No 
-						<input type="radio" name="scelta" value="3"/>Presa Visione
-						<input type="submit" name="invia" id="invia" class="button" value="Firma"/>
+						<input type="radio" name="scelta" class="s1-'.$post->ID.'" value="1"/>Si 
+						<input type="radio" name="scelta" class="s2-'.$post->ID.'" value="2"/>No 
+						<input type="radio" name="scelta" class="s3-'.$post->ID.'" value="3" checked="checked"/>Presa Visione
+						<input type="submit" name="inviaadesione" class="button inviaadesione" id="'.$post->ID.'" value="Firma" rel="'.$post->post_title.'"/>
 					</form>';
 				}else
 					$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$post->ID.'">Firma Circolare</a>';
 			}
-			setup_postdata($post);
 			$dati_firma=get_Firma_Circolare($post->ID);
 			echo "
 					<tr>

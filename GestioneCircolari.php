@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:0.2
+Version:1.0
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -66,8 +66,9 @@ register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
 add_filter( 'the_content', 'vis_firma');
 add_shortcode('VisCircolari', 'VisualizzaCircolari');
+add_action('wp_head', 'TestataCircolari' );
 /*register_deactivation_hook( __FILE__, 'deactivate') );	
-//add_filter( 'posts_where' , 'posts_where' );
+
 function my_posts_request_filter( $input ) {
 	print_r( $input );
 	return $input;
@@ -75,7 +76,7 @@ function my_posts_request_filter( $input ) {
 add_filter( 'posts_request', 'my_posts_request_filter' );
 
 function posts_where( $where ) {
-	echo $where;
+	echo $where;exit;
 	$PT=substr($where,strpos($where,"post_type"),strlen($where));
 	$PT=substr($PT,strpos($PT,"'"),strlen($where));
 //	echo "<br />1 ".$PT;
@@ -86,13 +87,22 @@ function posts_where( $where ) {
 	//$where .= " AND post_type in ('circolari','post')";
 	return $where;
 }
+
+add_filter( 'posts_where' , 'posts_where' );
 */
+function search_filter($query) {
+
+if (get_post_type()=='newsletter' ) {
+    	      $query->set('post_type', array( 'post', 'circolari' ) );
+}
+	return $query;
+}
+
+add_action('pre_get_posts','search_filter');
 
 function VisualizzaCircolari(){
 	require_once ( dirname (__FILE__) . '/admin/frontend.php' );
-return $ret;
-
-
+	return $ret;
 }
 
 function vis_firma( $content ){
@@ -139,17 +149,18 @@ function vis_firma( $content ){
 					$Campo_Firma="Firmata".$Campo_Firma_Adesione;
 				}
 				else{
+					
 					if ($Adesione[0]=="Si"){			
-						$Campo_Firma='<form action="'.$BaseUrl.'" id="adesione" method="get" style="display:inline;">
-							<input type="hidden" name="post_type" value="circolari" />
-							<input type="hidden" name="page" value="Firma" />
-							<input type="hidden" name="op" value="Adesione" />
-							<input type="hidden" name="pid" value="'.$PostID.'" />
-							<input type="radio" name="scelta" value="1"/>Si 
-							<input type="radio" name="scelta" value="2"/>No 
-							<input type="radio" name="scelta" value="3"/>Presa Visione
-							<input type="submit" name="invia" id="invia" class="button" value="Firma"/>
-						</form>';
+					$Campo_Firma='<form action="'.$BaseUrl.'"  method="get" style="display:inline;">
+						<input type="hidden" name="post_type" value="circolari" />
+						<input type="hidden" name="page" value="Firma" />
+						<input type="hidden" name="op" value="Adesione" />
+						<input type="hidden" name="pid" value="'.$PostID.'" />
+						<input type="radio" name="scelta" class="s1-'.$PostID.'" value="1"/>Si 
+						<input type="radio" name="scelta" class="s2-'.$PostID.'" value="2"/>No 
+						<input type="radio" name="scelta" class="s3-'.$PostID.'" value="3" checked="checked"/>Presa Visione
+						<input type="submit" name="inviaadesione" class="button inviaadesione" id="'.$PostID.'" value="Firma" rel="'.get_the_title($PostID).'"/>
+					</form>';
 					}else
 						$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$PostID.'">Firma Circolare</a>';
 				}
@@ -195,7 +206,40 @@ function add_circolari_menu_bubble() {
 
 function circolari_add_menu(){
    add_submenu_page( 'edit.php?post_type=circolari', 'Parametri',  'Parametri', 'manage_options', 'circolari', 'circolari_MenuPagine');
-    add_submenu_page( 'edit.php?post_type=circolari', 'Firma',  'Firma', 'read', 'Firma', 'circolari_GestioneFirme');
+   $pageFirma=add_submenu_page( 'edit.php?post_type=circolari', 'Firma',  'Firma', 'read', 'Firma', 'circolari_GestioneFirme');
+   add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
+}
+
+function TestataCircolari() {
+?>
+<script language="JavaScript">
+jQuery.noConflict();
+(function($) {
+	$(function() {
+		$('.inviaadesione').click(function(){
+			switch ($("input[type=radio][name=scelta]:checked").val()){
+					case "1":
+						s="Si";
+						break;
+					case "2":
+						s="No";
+						break;
+					case "3":
+						s="Presa Visione";
+						break;
+				}
+			var answer = confirm("Circolare "+$(this).attr('rel') +"\nConfermi la scelta:\n\n   " + s +"\n\nAllo sciopero?")
+			if (answer){
+				return true;
+			}
+			else{
+				return false;
+			}					
+		});
+ });
+})(jQuery);
+</script>	
+<?php
 }
 
 function circolari_MenuPagine(){
@@ -208,6 +252,7 @@ function circolari_MenuPagine(){
 			break;
 		case "email":
 			circolari_SpostainNewsletter($_REQUEST["post_id"]);
+			break;
 		default:
 			circolari_Parametri();	
 	}
@@ -222,21 +267,64 @@ function circolari_uninstall() {
 }
 
 function circolari_SpostainNewsletter($IDPost){
-	global $wpdb;
-	$DatiPost=get_post( $IDPost,  ARRAY_A);
-	$DatiPost["ID"]= 0; 
-	$DatiPost["post_type"]= "newsletter"; 
-	//$IDNewPost=wp_insert_post( $DatiPost );
-	$PostsAllegati = get_posts(array('post_parent' => '783'));
-	print_r($PostsAllegati);
-	exit;
-	foreach($PostsAllegati as $PostsAllegato){
-		$PostsAllegato["ID"]= 0; 
-		$PostsAllegato["post_parent"]= 800;//$IDNewPost;
-		$IDNewPostAllegato=wp_insert_post( $PostsAllegato );
+$DatiPost=get_post( $IDPost,  ARRAY_A);
+		$args = array(
+			'post_type' => 'attachment',
+			'numberposts' => null,
+			'post_status' => null,
+			'post_parent' => $IDPost); 
+		$attachments = get_posts($args);
+		$LinkAllegati="";
+		if ($attachments) {
+			$LinkAllegati.="<p>Allegati
+			<ul>";
+			foreach ($attachments as $attachment) {
+				$LinkAllegati.="		<li><a href='$attachment->guid'>$attachment->post_title</a></li>";
+			}
+			$LinkAllegati.="</p>
+			</ul>";	
+		}
+$my_post = array(
+  		'post_title'    => $DatiPost['post_title'],
+  		'post_content'  => "<p>Ciao [USER-NAME]</p>
+<p>in data odierna è stata inserita la seguente circolare nel sito [SITE-NAME]</p>
+<p>[POST-EXCERPT]</p>
+<p>[POST-CONTENT]</p>".$LinkAllegati,
+  		'post_status'   => 'publish',
+  		'comment_status'   => 'closed',
+  		'ping_status' => 'closed',
+  		'post_author' => $DatiPost['post_author'],
+  		'post_name' => $DatiPost['post_name'],
+  		'post_type' => 'newsletter');
+$post_id =wp_insert_post( $my_post,$errore );
+echo '<div class="wrap">
+	  	<img src="'.Circolari_URL.'/img/mail.png" alt="Icona Send email" style="display:inline;float:left;margin-top:10px;"/>
+	  	<h2 style="margin-left:40px;">Crea NewsLetter 
+	  	<a href="'.home_url().'/wp-admin/edit.php?post_type=circolari" class="add-new-h2 tornaindietro">Torna indietro</a></h2>';
+
+	if($post_id>0){
+		$recipients=Array();
+		$recipients['list'][] = 1;
+		$recipients['list'][] = 2;
+		add_post_meta ( $post_id, "_easymail_recipients", $recipients );	
+		add_post_meta ( $post_id, "_placeholder_easymail_post",  $IDPost);	
+		add_post_meta ( $post_id, "_placeholder_post_imgsize", 'thumbnail' );	
+		add_post_meta ( $post_id, "_placeholder_newsletter_imgsize", 'thumbnail' );	
+		add_post_meta ( $post_id, "_easymail_theme", 'campaignmonitor_elegant.html' );	
+		echo "<p style='font-weight: bold;font-size: medium;color:green;'>NewsLetter Creata correttamente</p> 
+		<p style='font-weight: bold;font-style: italic;font-size: medium;'>Adesso dovete completare le operazioni di invio seguendo pochi e semplici passi:<ul style='list-style: circle outside;margin-left:20px;'>
+			<li>Selezionare la gestione delle NewsLetter</li>
+			<li>Entrare in modifica nella circolare appena creata (l'ultima, quella in cima alla lista)</li>
+			<li>Selezionate i destinatari</li>
+			<li>Memorizzare le modifiche</li>
+			<li>Dall'elenco delle NewsLetter, sulla riga corrente cliccare su <em>Richiesto: Crea la lista dei destinatari</em></li>
+		</ul>
+		</p>";
+		add_post_meta ( $IDPost, "_sendNewsLetter",date("d/m/y g:i O"));
+	}else{
+		echo "<p  style='font-weight: bold;font-size: medium;color:red;'>NewsLetter Non Creata correttamente, errore riportato:</p>";
+				print_r($errore);			
 	}
-	
-	echo "ID del nuovo Post ".$IDNewPost;
 }
 function circolari_Parametri(){
 	
@@ -305,8 +393,15 @@ function circolari_NuoveColonneContenuto($column_name, $post_ID) {
 		if($sciopero[0]=="Si")
 			$Linkfirma='<a href="'.admin_url().'edit.php?post_type=circolari&page=circolari&op=Adesioni&post_id='.$post_ID.'">Adesioni</a> |';		
 		if ($column_name == 'gestionecircolari') {  
-	            echo $Linkfirma.'  
-<a href="'.admin_url().'edit.php?post_type=circolari&page=circolari&op=email&post_id='.$post_ID.'">Invia per eMail</a>';  
+	    	if ( defined( 'ALO_EM_INTERVAL_MIN' ) ){
+				$DataInvio = get_post_meta( $post_ID, "_sendNewsLetter", true); 
+	    		if ($DataInvio){
+					$res=$wpdb->get_results("SELECT post_id FROM $wpdb->postmeta Where meta_value=$post_ID And ;");
+					$Linkfirma.="Inviata in data ". $DataInvio.' <a href="'.admin_url().'post.php?post='.$res[0]->post_id.'&action=edit">Modifica NewsLetter</a>';
+				}else
+	            	$Linkfirma.='<a href="'.admin_url().'edit.php?post_type=circolari&page=circolari&op=email&post_id='.$post_ID.'">Invia per eMail</a>';  
+			}
+			echo $Linkfirma;
 	     } 
 		 if ($column_name == 'numero'){
 		 	$numero=get_post_meta($post_ID, "_numero");

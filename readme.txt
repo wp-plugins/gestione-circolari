@@ -1,10 +1,9 @@
 === Gestione Circolari ===
 Contributors: Scimone Ignazio
-Donate link: www.sisviluppo.info
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 3.8
-Stable tag: 0.2
+Stable tag: 1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +26,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 <br />	4.2 <strong>Categoria Circolari</strong>; indica la categoria delle circolari utilizzate nei post, questo parametro permette di fondere le circolari codificate negli articoli a quelli codificati con la gestione delle circoalri 
 5. Inserire le circolari, selezionando i destinatari nella finestra dei destinatari, il numero progressivo se diverso da quello proposto, selezionare l'eventuale richiesta di firma, selezionare l'eventuale indicazione di circolare per sciopero 
 6. Creare una pagina con lo shortcode [VisCircolari] e collegarla ad una voce di menu
-7. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione.
+7. inserire il widget che indica, se l'utente &egrave; loggato il numero di circolari da firmare o da prendere in visione <strong>Circolari</strong>.
+8. inserire il widget che riproduce la struttura temporale della pubblicazione delle circolari <strong>Navigazione Circolari</strong>.
 
 == Screenshots ==
 
@@ -41,7 +41,11 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
-
+= 1.0 =
+- <strong>Sistemati</strong> bugs vari
+- <strong>Inserita</strong> la possibilità di inviare le circolari per email attraverso il plugin <strong>ALO EasyMail Newsletter</strong>
+- <strong>Modificata</strong> la firma delle circolari, adesso per le circolari sindacali viene chiesta la conferma.
+- <strong>Sistemati</strong> alcuni problemi in fase di firma delle circolari, che adesso &egrave; possibile firmare anche nel Front End del sito.
 = 0.2 =
 - <strong>Inserito</strong> lo shortcode da inserire nella pagina che elenca le circolari
 - <strong>Sistemati</strong> bugs vari
