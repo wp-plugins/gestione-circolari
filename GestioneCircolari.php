@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:1.0
+Version:1.1
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -149,7 +149,6 @@ function vis_firma( $content ){
 					$Campo_Firma="Firmata".$Campo_Firma_Adesione;
 				}
 				else{
-					
 					if ($Adesione[0]=="Si"){			
 					$Campo_Firma='<form action="'.$BaseUrl.'"  method="get" style="display:inline;">
 						<input type="hidden" name="post_type" value="circolari" />
@@ -396,7 +395,7 @@ function circolari_NuoveColonneContenuto($column_name, $post_ID) {
 	    	if ( defined( 'ALO_EM_INTERVAL_MIN' ) ){
 				$DataInvio = get_post_meta( $post_ID, "_sendNewsLetter", true); 
 	    		if ($DataInvio){
-					$res=$wpdb->get_results("SELECT post_id FROM $wpdb->postmeta Where meta_value=$post_ID And ;");
+					$res=$wpdb->get_results("SELECT post_id FROM $wpdb->postmeta Where meta_value=$post_ID And meta_key='_placeholder_easymail_post';");
 					$Linkfirma.="Inviata in data ". $DataInvio.' <a href="'.admin_url().'post.php?post='.$res[0]->post_id.'&action=edit">Modifica NewsLetter</a>';
 				}else
 	            	$Linkfirma.='<a href="'.admin_url().'edit.php?post_type=circolari&page=circolari&op=email&post_id='.$post_ID.'">Invia per eMail</a>';  
@@ -508,6 +507,7 @@ function circolari_salva_dettagli( $post_id ){
 			update_post_meta( $post_id, '_anno', $_POST["anno"]);
 			update_post_meta( $post_id, '_firma', $_POST["firma"]);
 			update_post_meta( $post_id, '_sciopero', $_POST["sciopero"]);
+			update_post_meta( $post_id, '_visibilita', $_POST["visibilita"]);
 
 		}
 }
@@ -515,6 +515,7 @@ function circolari_crea_box(){
   add_meta_box('prog', 'Progressivo', 'circolari_crea_box_progressivo', 'circolari', 'advanced', 'high');
   add_meta_box('firma', 'Richiesta Firma', 'circolari_crea_box_firma', 'circolari', 'advanced', 'high');
   add_meta_box('sciopero', 'Circolare comunicazione Sciopero', 'circolari_crea_box_firma_sciopero', 'circolari', 'advanced', 'high');
+  add_meta_box('visibilita', 'Visibilit&agrave;', 'circolari_crea_box_visibilita', 'circolari', 'advanced', 'high');
 }
 
 function NewNumCircolare(){
@@ -554,6 +555,19 @@ echo '<label>Numero/Anno</label>
 	<input type="text" name="numero" value="'.$numero.'" size="5" style="text-align:right"/>/ <input type="text" name="anno" value="'.$anno.'" size="4"/>' ;
 }
 
+function circolari_crea_box_visibilita( $post ){
+$visibilita=get_post_meta($post->ID, "_visibilita");
+if (count($visibilita)==0)
+	$selp='checked="checked"';
+else 
+	if ($visibilita=="p")
+		$selp='checked="checked"';
+	else	
+		$seld='checked="checked"';
+echo '<legend>Indicare chi potr&agrave; visualizzare la circolare</legend>
+Pubblica <input type="radio" name="visibilita" value="p" '.$selp.'/>
+Solo destinatari <input type="radio" name="visibilita" value="d" '.$seld.'/>';
+}
 function circolari_crea_box_firma( $post ){
 $firma=get_post_meta($post->ID, "_firma");
 if($firma[0]=="Si")

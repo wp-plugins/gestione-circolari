@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 3.8
-Stable tag: 1.0
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,6 +41,9 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 1.1 =
+- <strong>Sistemati</strong> bugs vari
+- <strong>Implementato</strong> il sitema che limita la visibilità delle circolari ai soli destinatari
 = 1.0 =
 - <strong>Sistemati</strong> bugs vari
 - <strong>Inserita</strong> la possibilità di inviare le circolari per email attraverso il plugin <strong>ALO EasyMail Newsletter</strong>

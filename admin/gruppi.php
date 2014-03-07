@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.0
+ * @ver 1.1
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
@@ -104,10 +104,10 @@ function Crea_tassonomia_GruppoUtenti()
 			'show_admin_column' => true,
 			'hierarchical' => true,
 			'labels' => array(
-				'name' => __( 'Visibilità' ),
-				'singular_name' => __( 'Visibilità' ),
+				'name' => __( 'Destinatari' ),
+				'singular_name' => __( 'Destinatario' ),
 				'menu_name' => __( 'Gruppi Utenti' ),
-				'search_items' => __( 'Creca Gruppo' ),
+				'search_items' => __( 'Cerca Gruppo' ),
 				'popular_items' => __( 'Gruppo più Popolare' ),
 				'all_items' => __( 'Tutti i Gruppi' ),
 				'edit_item' => __( 'Modifica Gruppo' ),
