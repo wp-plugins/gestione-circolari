@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.1
+ * @ver 1.2
  */
  
 function circolari_GestioneFirme()
@@ -22,10 +22,58 @@ if($msg!="")
 }
 
 function VisualizzaTabellaCircolari(){
-$Circolari=get_option('Pasw_Comunicazioni');	
-$Posts = get_posts('post_type=circolari');
+$Circolari=get_option('Pasw_Comunicazioni');
+$NumCircolari =GetNumCircolariDaFirmare("N");
+$NumPagine=intval($NumCircolari/get_option('Circolari_NumPerPag'));	
+if ($NumPagine<$NumCircolari/get_option('Circolari_NumPerPag'))
+	$NumPagine++;
+if ($NumPagine>1){
+	$mTop="0";
+	if (!isset($_GET['npag'])){
+		$CurPage=1;
+		$OSPag=0;
+	}else{
+		$OSPag=($_GET['npag']-1)*get_option('Circolari_NumPerPag');
+		$CurPage=$_GET['npag'];
+	}
+	if ($CurPage==1){
+		$Dietro=" disabled";
+		$Pre=1;	
+	}else{
+		$Dietro="";
+		$Pre=$CurPage-1;			
+	}
+	if ($CurPage==$NumPagine){
+		$Avanti=" disabled";
+		$Suc=$NumPagine;
+	}else{
+		$Avanti="";
+		$Suc=$CurPage+1;
+	}
+		
+	echo '
+	<div class="tablenav top">
+		<div class="tablenav-pages">
+			<span class="displaying-num">'.$NumCircolari.' circolari</span>
+			<span class="pagination-links">
+				<a class="first-page'.$Dietro.'" title="Vai alla prima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=Firma">&laquo;</a>
+				<a class="prev-page'.$Dietro.'" title="Torna alla pagina precedente." href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=Firma&npag='.$Pre.'">&lsaquo;</a>
+			<span class="paging-input">
+				<input class="current-page" title="Pagina corrente." type="text" name="paged" value="'.$CurPage.'" size="2" /> di <span class="total-pages">'.$NumPagine.'</span>
+			</span>
+				<a class="next-page'.$Avanti.'" title="Vai alla pagina successiva" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=Firma&npag='.$Suc.'">&rsaquo;</a>
+				<a class="last-page'.$Avanti.'" title="Vai all&#039;ultima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=Firma&npag='.$NumPagine.'">&raquo;</a>
+			</span>
+		</div>
+	</div>';
+}else{
+	$mTop="20";
+}
+//echo 'post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag;
+$Posts = get_posts('post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag);
+
 echo '
-<div style="width:100%;margin-top:20px;">
+<div style="width:100%;margin-top:'.$mTop.'px;">
 	<table class="widefat">
 		<thead>
 			<tr>

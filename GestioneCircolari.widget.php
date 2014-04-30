@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.1
+ * @ver 1.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -53,7 +53,7 @@ public function widget( $args, $instance )
 		</p>
 		<p style="font-size:0.8em;">
 			<span style="background-color:red;">&nbsp;&nbsp;&nbsp;</span>
-			<a href="wp-admin/edit.php?post_type=circolari&page=Firma" style="margin-top:-15px;margin-left:-5px">Firma le circolari</a>
+			<a href="'.get_home_url().'/wp-admin/edit.php?post_type=circolari&page=Firma" style="margin-top:-15px;margin-left:-5px">Firma le circolari</a>
 		</p>';
 		else
 			echo'<p style="font-size:0.8em;"><span style="background-color:green;">&nbsp;&nbsp;</span>Nessuna Circolare da Firmare</p>';

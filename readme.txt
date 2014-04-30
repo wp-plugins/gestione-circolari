@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 3.8
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,8 @@ Gestione Circolari Scolastiche.
 
 == Description ==
 
-Gestione delle circolari scolastiche con la possibilit&agrave; di richiedere la firma e l'adesione alle circolari sindacali
+Gestione delle circolari scolastiche con la possibilit&agrave; di richiedere la firma e l'adesione alle circolari sindacali.
+Questo plugin utilizza un sistema interno di profilatura degli utenti in gruppi (es.Docenti, Personale ATA, etc..) che saranno utilizzati per indirizzare le circolari a specifici utenti. 
 
 == Installation ==
 
@@ -41,6 +42,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 1.2 =
+- <strong>Sistemati</strong> bugs vari
 = 1.1 =
 - <strong>Sistemati</strong> bugs vari
 - <strong>Implementato</strong> il sitema che limita la visibilità delle circolari ai soli destinatari

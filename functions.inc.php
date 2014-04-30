@@ -96,6 +96,24 @@ foreach($ListaUtenti as $utente){
 return $UtentiCircolare;
 }
 
+function get_Circolari_Gruppi(){
+	global $wpdb,$table_prefix;
+	$Gruppi=array();
+	if (get_option('Circolari_UsaGroups')=="si"){
+		$Sql="Select group_id, name From ".$table_prefix."groups_group Where group_id>1";
+		$Records=$wpdb->get_results($Sql,ARRAY_A);
+		foreach( $Records as $Record)
+			$Gruppi[]=array("Id"=>$Record["group_id"],
+						  "Nome"=>$Record["name"]);
+	}else{
+		$Records =get_terms('gruppiutenti',array('orderby'=> 'name','hide_empty'=> false));
+		foreach( $Records as $Record)
+			$Gruppi[]=array("Id"=>$Record->term_id,
+					      "Nome"=>$Record->name);
+	}
+	return $Gruppi;
+}
+
 function Is_Circolare_per_User($IDCircolare,$IDUser=-1){
 	global $current_user;
 if ($IDUser==-1){

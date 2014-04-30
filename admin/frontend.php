@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.1
+ * @since 1.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -35,6 +35,8 @@ $args = array( 'category' => $IdCircolari,
 			   'year' => $annocorrente,
 			   'post_status' => 'publish');
 $Circolari = get_posts($args);
+//print_r($args);
+//print_r($Circolari);
 if (empty($Circolari)){
 	$Contenuto.='<h3>Non risultano circolari per l\'anno '.$annocorrente.' verranno visualizzate quelle del '.$annoprecedente.'</h3>';
 	$args = array( 'category' => $IdCircolari,
@@ -77,6 +79,7 @@ foreach($Circolari as $post) {
 $Contenuto.= '
 		</div>
 		<div style="clear:both"></div>';
+
 return $Contenuto;
 }
 ?>

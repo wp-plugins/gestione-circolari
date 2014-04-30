@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:1.1
+Version:1.2
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -211,7 +211,7 @@ function circolari_add_menu(){
 
 function TestataCircolari() {
 ?>
-<script language="JavaScript">
+<script type='text/javascript'>
 jQuery.noConflict();
 (function($) {
 	$(function() {
@@ -326,7 +326,6 @@ echo '<div class="wrap">
 	}
 }
 function circolari_Parametri(){
-	
 	$DestTutti  =  get_option('Circolari_Visibilita_Pubblica');
 echo'
 <div class="wrap">
@@ -353,6 +352,12 @@ echo'</select></td>
 			wp_dropdown_categories('orderby=name&hide_empty=0&name=Categoria&id=categoria&selected='.get_option('Circolari_Categoria'));
 echo'			</td>				
 		</tr>
+		<tr valign="top">
+			<th scope="row"><label for="numcircolarifirma">Numero Circolari da visualizzare per pagina</label></th>
+			<td>
+				<input type="text" name="NCircolariPF" id="NCircolariPF" size="3" maxlength="3" value="'.get_option('Circolari_NumPerPag').'" />
+			</td>				
+		</tr>
 	</table>
 	    <p class="submit">
 	        <input type="submit" name="Circolari_submit_button" value="Salva Modifiche" />
@@ -365,6 +370,7 @@ function update_Impostazioni_Circolari(){
     if($_POST['Circolari_submit_button'] == 'Salva Modifiche'){
 	    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
 	    update_option('Circolari_Categoria',$_POST['Categoria'] );
+	    update_option('Circolari_NumPerPag',$_POST['NCircolariPF'] );
 		header('Location: '.get_bloginfo('wpurl').'/wp-admin/edit.php?post_type=circolari'); 
 	}
 }
@@ -432,7 +438,7 @@ function crea_custom_circolari() {
    'view_item' => __( 'Visualizza' ),
    'search_items' => __( 'Cerca Circolare' ),
    'not_found' => __( 'Nessuna Circolare trovata' ),
-   'not_found_in_trash' => __( 'Nessuna Circoalre trovata nel cestino' ),
+   'not_found_in_trash' => __( 'Nessuna Circolare trovata nel cestino' ),
    'parent' => __( 'Circolare superiore' )),
    'public' => true,
    'show_ui' => true,
@@ -560,13 +566,15 @@ $visibilita=get_post_meta($post->ID, "_visibilita");
 if (count($visibilita)==0)
 	$selp='checked="checked"';
 else 
-	if ($visibilita=="p")
+	if ($visibilita[0]=="p")
 		$selp='checked="checked"';
 	else	
 		$seld='checked="checked"';
 echo '<legend>Indicare chi potr&agrave; visualizzare la circolare</legend>
 Pubblica <input type="radio" name="visibilita" value="p" '.$selp.'/>
 Solo destinatari <input type="radio" name="visibilita" value="d" '.$seld.'/>';
+$term_list = wp_get_post_terms($post->ID, 'gruppiutenti', array("fields" => "names"));
+print_r($term_list);
 }
 function circolari_crea_box_firma( $post ){
 $firma=get_post_meta($post->ID, "_firma");
@@ -579,7 +587,7 @@ function circolari_crea_box_firma_sciopero( $post ){
 $sciopero=get_post_meta($post->ID, "_sciopero");
 if($sciopero[0]=="Si")
 	$sciopero='checked="checked"';
- echo "<label>La circolare si riferisce ad uno sciopero, bisogna indirare l'adesione o la presa visione</label>
+ echo "<label>La circolare si riferisce ad uno sciopero, bisogna indicare l'adesione o la presa visione</label>
 	<input type='checkbox' name='sciopero' value='Si' $sciopero />" ;
 }
 
