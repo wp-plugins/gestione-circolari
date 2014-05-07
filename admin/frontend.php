@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.2
+ * @since 1.3
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -33,6 +33,8 @@ if (isset($_REQUEST['Anno'])){
 $args = array( 'category' => $IdCircolari,
 		       'post_type' => array('post','circolari'),
 			   'year' => $annocorrente,
+			   'year' => $annocorrente,
+			   'monthnum' => $_REQUEST['Mese'],
 			   'post_status' => 'publish');
 $Circolari = get_posts($args);
 //print_r($args);
