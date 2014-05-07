@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.3
+ * @since 1.4
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -23,27 +23,29 @@ function Lista_Circolari($Anno,$Mese){
 $Contenuto="";
 $IdCircolari=get_option('Circolari_Categoria');
 $mesecorrente = date('n');
-if (isset($_REQUEST['Anno'])){
+if (isset($_REQUEST['Anno']))
 	$annocorrente = $_REQUEST['Anno'];
-	$annoprecedente=$_REQUEST['Anno']-1;
-}else{
+else
 	$annocorrente = date('Y');
-	$annoprecedente=date('Y')-1;
-}
+if (isset($_REQUEST['Mese']))
+	$mesecorrente=$_REQUEST['Mese'];
+elseif(isset($_REQUEST['Anno']))
+	$mesecorrente="";
+else
+	$mesecorrente=date('n');
 $args = array( 'category' => $IdCircolari,
 		       'post_type' => array('post','circolari'),
 			   'year' => $annocorrente,
 			   'year' => $annocorrente,
-			   'monthnum' => $_REQUEST['Mese'],
+			   'monthnum' => $mesecorrente,
+			   'posts_per_page'  => -1,
 			   'post_status' => 'publish');
 $Circolari = get_posts($args);
-//print_r($args);
-//print_r($Circolari);
 if (empty($Circolari)){
-	$Contenuto.='<h3>Non risultano circolari per l\'anno '.$annocorrente.' verranno visualizzate quelle del '.$annoprecedente.'</h3>';
+	$Contenuto.='<h3>Non risultano circolari per l\'anno '.$annocorrente.' mese '.$mesecorrente.'verranno visualizzate le ultime 5 codificate</h3>';
 	$args = array( 'category' => $IdCircolari,
 		       'post_type' => array('post','circolari'),
-				'posts_per_page'  => 5,
+			   'posts_per_page'  => 5,
 			   'post_status' => 'publish');
 	$Circolari = get_posts($args);
 }
