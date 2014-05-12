@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.4
+ * @since 1.5
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -62,21 +62,34 @@ foreach($Circolari as $post) {
 		$Elenco="";
 		if(!empty($fgs)){
 			foreach($fgs as $fg){
-				$Elenco.="<em>".$fg->name."</em> - ";
+				$Elenco.=$fg->name." - ";
 			}
 			$Elenco=substr($Elenco,0,strlen($Elenco)-3);
 		}
-		$Contenuto.='<h4>'.FormatDataItaliano($post->post_date).' - 
-		<a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a></h4>
-		<div>
-			<p> Tipo => <spam style="font-style: italic; font-weight: bold;font-size:0.9em;">'.$post->post_type.'</spam>';
+		$Contenuto.='
+		<div style="margin-bottom:5px;padding:3px;">';
+		$Contenuto.='
+			<h4>'.FormatDataItaliano($post->post_date).' - <a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a>
+			</h4>
+			<div style="height:30px;">
+				<div style="display:inline;">
+					<img src="'.Circolari_URL.'img/tipo.png" style="border:0;" alt="Icona tipo post" />
+				</div>
+				<div style="display:inline;font-style: italic; font-weight: bold;font-size:0.9em;vertical-align: top;">'
+					.$post->post_type.'
+				</div>';
 		if ($post->post_type=="circolari")
-			$Contenuto.=' Destinatari => <spam style="font-style: italic; font-weight: bold;font-size:0.9em;">'.$Elenco.'</spam>';
+			$Contenuto.='
+				<div style="display:inline;">
+					<img src="'.Circolari_URL.'img/destinatari.png" style="border:0;" alt="Icona destinatari"/>
+				</div>
+				<div style="font-style: italic; font-weight: bold;font-size:0.9em;display:inline;vertical-align: top;">'.$Elenco.'</div>';
 		$Contenuto.='	
-			</p>
-		</div>
-		<div>
-			'.$post->post_excerpt .'
+			</div>
+			<div style="margin-bottom:5px;">
+				<em>'.$post->post_excerpt .'</em>
+			</div>
+			<hr />
 		</div>';
 	}
 }

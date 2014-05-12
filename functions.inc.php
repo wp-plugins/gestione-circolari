@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.4
+ * @ver 1.5
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -204,38 +204,9 @@ order by month('.$table_prefix.'posts.post_date) DESC;';
 	
 			$Mesi=$wpdb->get_results($SqlMese,ARRAY_A );
 			foreach( $Mesi as $Mese){
-				$Ritorno.='<li style="margin-left:10px;"><a href="'.$urlCircolari.'?Anno='.$Anno["anno"].'&Mese='.$Mese['mese'].'" title="link agli articoli dell\'anno '.$Anno["anno"].' Mese '.$Mese['mese'].'">'.$mesi[$Mese['mese']].'</a></li>';
+				$Ritorno.='<li style="margin-left:10px;"><a href="'.$urlCircolari.'?Anno='.$Anno["anno"].'&amp;Mese='.$Mese['mese'].'" title="link agli articoli dell\'anno '.$Anno["anno"].' Mese '.$Mese['mese'].'">'.$mesi[$Mese['mese']].'</a></li>';
 			}
 		}
-/*
-}else{
-
-	$Sql='SELECT year('.$table_prefix.'posts.post_date) as anno  , month('.$table_prefix.'posts.post_date) as mese
-
-		FROM '.$table_prefix.'posts JOIN '.$table_prefix.'term_relationships ON '.$table_prefix.'posts.ID = '.$table_prefix.'term_relationships.object_id
-
-                   JOIN '.$table_prefix.'term_taxonomy ON '.$table_prefix.'term_taxonomy.term_taxonomy_id = '.$table_prefix.'term_relationships.term_taxonomy_id
-
-		WHERE post_type="post" and post_status="publish" and '.$table_prefix.'term_taxonomy.term_id='.$Categoria.' And year('.$table_prefix.'posts.post_date)='.$Anno.' 
-
-		group by year('.$table_prefix.'posts.post_date), month('.$table_prefix.'posts.post_date)
-
-		order by year('.$table_prefix.'posts.post_date) DESC, month('.$table_prefix.'posts.post_date) DESC;';
-
-	$AnniMesi=$wpdb->get_results($Sql,ARRAY_A );
-
-		foreach( $AnniMesi as $AnnoMese){
-
-			$Mese=$AnnoMese["mese"];
-
-			$Ritorno.='<li><a href="'.home_url().'/'.$AnnoMese["anno"].'/'.$Mese.'/?catid='.$Categoria.'" title="link agli articoli di '.$mesi[$Mese-1].' del '.$AnnoMese["anno"].'">'.$mesi[$AnnoMese["mese"]-1].' '.$AnnoMese["anno"].'</a></li>
-
-				';
-
-		}
-
-}
-*/
 //echo $Sql;	
 $Ritorno.="</ul>";
 return $Ritorno;
