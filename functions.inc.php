@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.5
+ * @ver 1.6
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -25,9 +25,23 @@ function GetNumeroCircolare($PostID){
 return $NumeroCircolare;
 }
 
+function Is_Circolare_Da_Firmare($IDCircolare){
+	global $wpdb, $current_user;
+	get_currentuserinfo();
+	$destinatari=Get_Users_per_Circolare($IDCircolare);
+	$DaFirmare=get_post_meta( $IDCircolare, "_firma",true);
+	$PresaVisione=get_post_meta( $IDCircolare, "_sciopero",true);
+	if (in_array($current_user->ID,$destinatari) and ($DaFirmare=="Si" or $PresaVisione=="Si"))
+		return TRUE;
+	else
+		return FALSE;
+}
+
 function Is_Circolare_Firmata($IDCircolare){
 	global $wpdb, $current_user;
 	get_currentuserinfo();
+	if (!Is_Circolare_Da_Firmare($IDCircolare))
+		return TRUE;
 	$ris=$wpdb->get_results("SELECT * FROM $wpdb->table_firme_circolari WHERE post_ID=$IDCircolare AND user_ID=$current_user->ID;");
 	if (!empty($ris))
 		return TRUE;
@@ -59,11 +73,33 @@ function get_Firma_Circolare($IDCircolare,$IDUser=-1){
 
 function GetNumCircolariDaFirmare($Tipo="N"){
 	global $wpdb;
-	$ris=$wpdb->get_results("SELECT * 
+	$Sql="SELECT *
+		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON wp_posts.ID = $wpdb->postmeta.post_id)
+			WHERE $wpdb->posts.post_type = 'circolari' AND 
+				  $wpdb->posts.post_status = 'publish' AND 
+				  $wpdb->posts.ID IN (
+						SELECT $wpdb->postmeta.post_id
+							FROM $wpdb->postmeta
+							WHERE ($wpdb->postmeta.meta_key = '_firma' AND $wpdb->postmeta.meta_value = 'Si')
+							       OR ($wpdb->postmeta.meta_key = '_sciopero' AND $wpdb->postmeta.meta_value = 'Si')
+							       )
+						GROUP BY post_id";
+	$ris=$wpdb->get_results($Sql);
+	
+/*	"SELECT * 
 	FROM ($wpdb->posts left join $wpdb->postmeta on $wpdb->posts.ID = $wpdb->postmeta.post_id)
 	Where  $wpdb->posts.post_type='circolari' 
 	   and $wpdb->posts.post_status='publish' 
-	   and ($wpdb->postmeta.meta_key='_firma' and $wpdb->postmeta.meta_value ='Si')");
+	   and (($wpdb->postmeta.meta_key='_firma' and $wpdb->postmeta.meta_value ='Si')
+	   	or ($wpdb->postmeta.meta_key='_sciopero' and $wpdb->postmeta.meta_value ='Si'))");
+	   	echo "SELECT * 
+	FROM ($wpdb->posts left join $wpdb->postmeta on $wpdb->posts.ID = $wpdb->postmeta.post_id)
+	Where  $wpdb->posts.post_type='circolari' 
+	   and $wpdb->posts.post_status='publish' 
+	   and (($wpdb->postmeta.meta_key='_firma' and $wpdb->postmeta.meta_value ='Si')
+	   	or ($wpdb->postmeta.meta_key='_sciopero' and $wpdb->postmeta.meta_value ='Si'))";
+*/	
+	
 	if (empty($ris))
 		return 0;	
 	if ($Tipo=="N")

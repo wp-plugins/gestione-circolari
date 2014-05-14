@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.5
+ * @since 1.6
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -75,16 +75,31 @@ foreach($Circolari as $post) {
 				<div style="display:inline;">
 					<img src="'.Circolari_URL.'img/tipo.png" style="border:0;" alt="Icona tipo post" />
 				</div>
-				<div style="display:inline;font-style: italic; font-weight: bold;font-size:0.9em;vertical-align: top;">'
-					.$post->post_type.'
-				</div>';
+				<div style="display:inline;vertical-align:top;">
+					<p style="font-style:italic;font-weight:bold;font-size:0.9em;display:inline;margin-top:3px;">'.$post->post_type.'</p>
+				</div>';	
 		if ($post->post_type=="circolari")
 			$Contenuto.='
 				<div style="display:inline;">
 					<img src="'.Circolari_URL.'img/destinatari.png" style="border:0;" alt="Icona destinatari"/>
 				</div>
-				<div style="font-style: italic; font-weight: bold;font-size:0.9em;display:inline;vertical-align: top;">'.$Elenco.'</div>';
-		$Contenuto.='	
+				<div style="display:inline;vertical-align:top;">
+					<p style="font-style:italic;font-weight:bold;font-size:0.9em;display:inline;margin-top:3px;">'.$Elenco.'</p>
+				</div>';	
+		if (!Is_Circolare_Firmata($post->ID)){
+			if (get_post_meta($post->ID, "_sciopero",TRUE)=="Si")
+				$Tipo="Esprimere adesione";
+			else
+			if (get_post_meta($post->ID, "_firma",TRUE)=="Si")
+				$Tipo="Firmare";
+			$Contenuto.='
+				<div style="display:inline;">
+					<img src="'.Circolari_URL.'/img/firma.png" style="border:0;" alt="Icona firma o presa visione"/>
+				</div>
+				<div style="display:inline;vertical-align:top;">
+					<p style="font-style:italic;font-weight:bold;font-size:0.9em;display:inline;margin-top:3px;color:red;">'.$Tipo.'</p>
+				</div>';	
+		}		$Contenuto.='	
 			</div>
 			<div style="margin-bottom:5px;">
 				<em>'.$post->post_excerpt .'</em>

@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.5
+ * @ver 1.6
  */
  
 function circolari_GestioneFirme()
@@ -27,6 +27,7 @@ $NumCircolari =GetNumCircolariDaFirmare("N");
 $NumPagine=intval($NumCircolari/get_option('Circolari_NumPerPag'));	
 if ($NumPagine<$NumCircolari/get_option('Circolari_NumPerPag'))
 	$NumPagine++;
+$OSPag=0;
 if ($NumPagine>1){
 	$mTop="0";
 	if (!isset($_GET['npag'])){
@@ -50,7 +51,7 @@ if ($NumPagine>1){
 		$Avanti="";
 		$Suc=$CurPage+1;
 	}
-		
+
 	echo '
 	<div class="tablenav top">
 		<div class="tablenav-pages">
@@ -70,17 +71,40 @@ if ($NumPagine>1){
 	$mTop="20";
 }
 //echo 'post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag;
-$Posts = get_posts('post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag);
-
+/*$args = array(
+   'post_type' => 'circolari',
+   'posts_per_page' => get_option('Circolari_NumPerPag'),
+   'offset' => $OSPag,
+   'meta_key'=> 'in("_firma","_sciopero")',
+   'meta_value'=>'Si'
+ );
+// print_r($args);
+//$Posts = get_posts('post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag);*/
+	$Cpp=get_option('Circolari_NumPerPag');
+	global $wpdb;
+	$Sql="SELECT *
+		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON wp_posts.ID = $wpdb->postmeta.post_id)
+			WHERE $wpdb->posts.post_type = 'circolari' AND 
+				  $wpdb->posts.post_status = 'publish' AND 
+				  $wpdb->posts.ID IN (
+						SELECT $wpdb->postmeta.post_id
+							FROM $wpdb->postmeta
+							WHERE ($wpdb->postmeta.meta_key = '_firma' AND $wpdb->postmeta.meta_value = 'Si')
+							       OR ($wpdb->postmeta.meta_key = '_sciopero' AND $wpdb->postmeta.meta_value = 'Si')
+							       )
+						GROUP BY post_id
+						LIMIT $OSPag , $Cpp";
+	$Posts=$wpdb->get_results($Sql);
+//$Posts = get_posts($args);
 echo '
 <div style="width:100%;margin-top:'.$mTop.'px;">
 	<table class="widefat">
 		<thead>
 			<tr>
 				<th style="width:5%;">N°</th>
-				<th style="width:45%;">Titolo</th>
+				<th style="width:40%;">Titolo</th>
 				<th style="width:15%;">Tipo</th>
-				<th style="width:20%;">Firma</th>
+				<th style="width:25%;">Firma</th>
 				<th>Data</th>
 			</tr>
 		</thead>

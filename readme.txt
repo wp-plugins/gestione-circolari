@@ -2,8 +2,8 @@
 Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
-Tested up to: 3.8
-Stable tag: 1.5
+Tested up to: 3.9.1
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,10 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 1.6 =
+- <strong>Sistemati</strong> vari bug di secondaria importanza
+- <strong>Inserito</strong> nel Frontend un'icona con testo in rosso che evidenzia le circolari da firmare o da prendere visione
+- <strong>Implementata</strong> la navigazione per pagine nella visualizzazione delle firme/presa visione sciopero
 = 1.5 =
 - <strong>Sistemati</strong> due bugs di validazione del FrontEnd
 = 1.4 =

@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:1.5
+Version:1.6
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -416,9 +416,15 @@ function circolari_NuoveColonneContenuto($column_name, $post_ID) {
 		 if ($column_name == 'firme'){
 		 	$dest=wp_get_post_terms( $post_ID, 'gruppiutenti', array("fields" => "ids") ); 
 		 	$NU=0;
-			foreach($dest as $IdGruppo)
-				$NU+=Get_User_Per_Gruppo($IdGruppo);
-			echo Get_Numero_Firme_Per_Circolare($post_ID)."/$NU";			
+		 	$IdGruppoTutti=get_option('Circolari_Visibilita_Pubblica');
+			if(in_array($IdGruppoTutti,$dest))
+				echo Get_Numero_Firme_Per_Circolare($post_ID)."/".Get_User_Per_Gruppo($IdGruppoTutti);
+			else{
+				foreach($dest as $IdGruppo)
+					if ($IdGruppoTutti!=$IdGruppo)
+						$NU+=Get_User_Per_Gruppo($IdGruppo);
+				echo Get_Numero_Firme_Per_Circolare($post_ID)."/$NU";			
+			}
 		}
 	}
 }  
@@ -610,21 +616,74 @@ if(!empty($fgs)){
 	foreach($fgs as $fg){
 		$Elenco.="<em>".$fg->name."</em> - ";
 	}
+	$Elenco=substr($Elenco,0,strlen($Elenco)-3);
 }
-echo'	
-<div class="col-wrap">
-		<h3>Visibilit&aacute;</h3>
-			<p>'.$Elenco.'</p>
-</div><!-- /col-wrap -->';
+echo'
+<div style="display:inline;">
+	<img src="'.Circolari_URL.'img/destinatari.png" style="border:0;" alt="Icona destinatari"/>
+</div>
+<div style="display:inline;vertical-align:top;">
+	<p style="font-style:italic;font-weight:bold;display:inline;margin-top:3px;">'.$Elenco.'</p>
+</div>	
+';
 $utenti=Get_Users_per_Circolare($post_id);
 if ($Tipo==1)
 	$sottrai=1;
 else	
 	$sottrai=0;
+$NumUtentiFirme =count($utenti);
+//echo $NumUtentiFirme;
+//print_r($utenti);
+$NumPagine=intval($NumUtentiFirme/10);	
+if ($NumPagine<$NumUtentiFirme/10)
+	$NumPagine++;
+$OSPag=0;
+if ($NumPagine>1){
+	$mTop="0";
+	if (!isset($_GET['npag'])){
+		$CurPage=1;
+		$OSPag=0;
+	}else{
+		$OSPag=($_GET['npag']-1)*10;
+		$CurPage=$_GET['npag'];
+	}
+	if ($CurPage==1){
+		$Dietro=" disabled";
+		$Pre=1;	
+	}else{
+		$Dietro="";
+		$Pre=$CurPage-1;			
+	}
+	if ($CurPage==$NumPagine){
+		$Avanti=" disabled";
+		$Suc=$NumPagine;
+	}else{
+		$Avanti="";
+		$Suc=$CurPage+1;
+	}
+
+	echo '
+	<h2 style="text-align:center;">Elenco firme</h2>
+	<div class="tablenav top">
+		<div class="tablenav-pages">
+			<span class="displaying-num">'.$NumUtentiFirme.' circolari</span>
+			<span class="pagination-links">
+				<a class="first-page'.$Dietro.'" title="Vai alla prima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'">&laquo;</a>
+				<a class="prev-page'.$Dietro.'" title="Torna alla pagina precedente." href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$Pre.'">&lsaquo;</a>
+			<span class="paging-input">
+				<input class="current-page" title="Pagina corrente." type="text" name="paged" value="'.$CurPage.'" size="2" /> di <span class="total-pages">'.$NumPagine.'</span>
+			</span>
+				<a class="next-page'.$Avanti.'" title="Vai alla pagina successiva" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$Suc.'">&rsaquo;</a>
+				<a class="last-page'.$Avanti.'" title="Vai all&#039;ultima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$NumPagine.'">&raquo;</a>
+			</span>
+		</div>
+	</div>';
+}else{
+	$mTop="20";
+}
 echo '
-<div style="width:90%;margin-top:20px;">
+<div>
 	<table class="widefat">
-		<caption>Elenco Firme</caption>
 		<thead>
 			<tr>
 				<th style="width:'.(20-$sottrai).'%;">User login</th>
@@ -639,7 +698,8 @@ echo '
 			</tr>
 		</thead>
 		<tboby>';
-foreach($utenti as $utente){
+for($i=$OSPag;$i<$OSPag+10 And $i<count($utenti);$i++){
+	$utente=$utenti[$i];
 	$GruppoUtente=get_user_meta($utente->ID, "gruppo", true);
 	$firma=get_Firma_Circolare($post_id,$utente->ID);
 	$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => 0,'include'=>$GruppoUtente));
