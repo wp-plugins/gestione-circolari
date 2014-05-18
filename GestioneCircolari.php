@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:1.6
+Version:1.7
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -39,11 +39,11 @@ require_once(ABSPATH . 'wp-includes/pluggable.php');
 switch ($_REQUEST["op"]){
 	case "Firma":
 		global $msg;
-		$msg=FirmaCircolare($_REQUEST["pid"],-1);
+		$msg=FirmaCircolare($_REQUEST["pid"],-1,$_REQUEST["dest"]);
 		break;
 	case "Adesione":
 		global $msg;
-		$msg=FirmaCircolare($_REQUEST["pid"],$_REQUEST["scelta"]);
+		$msg=FirmaCircolare($_REQUEST["pid"],$_REQUEST["scelta"],$_REQUEST["dest"]);
 		break;	
 }
 
@@ -67,6 +67,8 @@ register_activation_hook( __FILE__,  'circolari_activate');
 add_filter( 'the_content', 'vis_firma');
 add_shortcode('VisCircolari', 'VisualizzaCircolari');
 add_action('wp_head', 'TestataCircolari' );
+add_action( 'admin_enqueue_scripts',  'Circoalri_Admin_Enqueue_Scripts' );
+
 /*register_deactivation_hook( __FILE__, 'deactivate') );	
 
 function my_posts_request_filter( $input ) {
@@ -90,6 +92,11 @@ function posts_where( $where ) {
 
 add_filter( 'posts_where' , 'posts_where' );
 */
+function Circoalri_Admin_Enqueue_Scripts( $hook_suffix ) {
+	wp_enqueue_script('jquery');
+	wp_enqueue_script( 'Circolari-admin', plugins_url('js/Circolari.js', __FILE__ ));
+}
+
 function search_filter($query) {
 
 if (get_post_type()=='newsletter' ) {
@@ -111,6 +118,8 @@ function vis_firma( $content ){
 	if (get_post_type( $PostID) !="circolari")
 		return $content;
 	if (!is_user_logged_in())
+		return $content;
+	if (!Is_Circolare_Da_Firmare($PostID) or !Is_Circolare_per_User($PostID))
 		return $content;
 	if (strlen(stristr($_SERVER["HTTP_REFERER"],"wp-admin/edit.php?post_type=circolari&page=Firma"))>0)
 		return "<br />
@@ -150,9 +159,7 @@ function vis_firma( $content ){
 				}
 				else{
 					if ($Adesione[0]=="Si"){			
-					$Campo_Firma='<form action="'.$BaseUrl.'"  method="get" style="display:inline;">
-						<input type="hidden" name="post_type" value="circolari" />
-						<input type="hidden" name="page" value="Firma" />
+					$Campo_Firma='<form action=""  method="get" style="display:inline;">
 						<input type="hidden" name="op" value="Adesione" />
 						<input type="hidden" name="pid" value="'.$PostID.'" />
 						<input type="radio" name="scelta" class="s1-'.$PostID.'" value="1"/>Si 
@@ -160,8 +167,9 @@ function vis_firma( $content ){
 						<input type="radio" name="scelta" class="s3-'.$PostID.'" value="3" checked="checked"/>Presa Visione
 						<input type="submit" name="inviaadesione" class="button inviaadesione" id="'.$PostID.'" value="Firma" rel="'.get_the_title($PostID).'"/>
 					</form>';
+
 					}else
-						$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$PostID.'">Firma Circolare</a>';
+						$Campo_Firma='<a href="?op=Firma&pid='.$PostID.'">Firma Circolare</a>';
 				}
 				$dati_firma=get_Firma_Circolare($PostID);
 			}	
@@ -206,6 +214,8 @@ function add_circolari_menu_bubble() {
 function circolari_add_menu(){
    add_submenu_page( 'edit.php?post_type=circolari', 'Parametri',  'Parametri', 'manage_options', 'circolari', 'circolari_MenuPagine');
    $pageFirma=add_submenu_page( 'edit.php?post_type=circolari', 'Firma',  'Firma', 'read', 'Firma', 'circolari_GestioneFirme');
+   add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
+   $pageFirmate=add_submenu_page( 'edit.php?post_type=circolari', 'Firmate',  'Firmate', 'read', 'Firmate', 'circolari_VisualizzaFirmate');
    add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
 }
 
@@ -597,6 +607,7 @@ if($sciopero[0]=="Si")
 	<input type='checkbox' name='sciopero' value='Si' $sciopero />" ;
 }
 
+
 function circolari_VisualizzaFirme($post_id,$Tipo=0){
 global $GestioneScuola;
 $numero=get_post_meta($post_id, "_numero");
@@ -605,7 +616,7 @@ $circolare=get_post($post_id);
 // Inizio interfaccia
 echo' 
 <div class="wrap">
-	      <img src="'.Circolari_URL.'/img/atti32.png" alt="Icona Atti" style="display:inline;float:left;margin-top:10px;"/>
+	      <img src="'.Circolari_URL.'/img/firma24.png" alt="Icona Atti" style="display:inline;float:left;margin-top:10px;"/>
 		  
 <h2 style="margin-left:40px;">Circolare n°'.$numero[0].'/'.$anno[0].'<br /><strong>'.$circolare->post_title.'</strong></h2>
 <div id="col-container">
