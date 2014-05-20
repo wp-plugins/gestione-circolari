@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.7
+ * @ver 1.8
  */
 
 function circolari_VisualizzaFirmate()
@@ -66,7 +66,7 @@ if ($NumPagine>1){
 //$Posts = get_posts('post_type=circolari&posts_per_page='.get_option('Circolari_NumPerPag').'&offset='.$OSPag);
 	global $wpdb;
 	$Sql="SELECT *
-		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON wp_posts.ID = $wpdb->postmeta.post_id)
+		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id)
 			WHERE $wpdb->posts.post_type = 'circolari' AND 
 				  $wpdb->posts.post_status = 'publish' AND 
 				  $wpdb->posts.ID IN (
@@ -218,7 +218,7 @@ if ($NumPagine>1){
 	$Cpp=get_option('Circolari_NumPerPag');
 	global $wpdb;
 	$Sql="SELECT *
-		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON wp_posts.ID = $wpdb->postmeta.post_id)
+		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id)
 			WHERE $wpdb->posts.post_type = 'circolari' AND 
 				  $wpdb->posts.post_status = 'publish' AND 
 				  $wpdb->posts.ID IN (
