@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.9
+ * @ver 2.0
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -177,6 +177,8 @@ function Is_Circolare_per_User($IDCircolare,$IDUser=-1){
 	if($DestTutti===FALSE)
 		$DestTutti=-1;
 	$dest=wp_get_post_terms( $IDCircolare, 'gruppiutenti', array("fields" => "ids") ); 
+	if (empty($dest))
+		$dest=array();
 	if (in_array($DestTutti,$dest))
 		$Vis=TRUE;
 	else{

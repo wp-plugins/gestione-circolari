@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 1.9
+ * @since 2.0
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -91,7 +91,7 @@ foreach($Circolari as $post) {
 		else{
 			$riassunto="";
 		}
-		if ($post->post_type=="circolari")
+		if (!empty($post->post_password))
 			$Contenuto.='
 				<div style="display:inline;">
 					<img src="'.Circolari_URL.'img/protetto.png" style="border:0;" alt="Icona protezione"/>
