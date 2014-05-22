@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 1.8
+ * @ver 1.9
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -168,28 +168,31 @@ function get_Circolari_Gruppi(){
 
 function Is_Circolare_per_User($IDCircolare,$IDUser=-1){
 	global $current_user;
-if ($IDUser==-1){
-	get_currentuserinfo();
-	$IDUser=$current_user->ID;
-}
-$Vis=FALSE;
-$DestTutti=get_option('Circolari_Visibilita_Pubblica');
-$dest=wp_get_post_terms( $IDCircolare, 'gruppiutenti', array("fields" => "ids") ); 
-if (in_array($DestTutti,$dest))
-	$Vis=TRUE;
-else{
-	$fgs = wp_get_object_terms($IDCircolare, 'gruppiutenti');
-	$GruppiSel=array();
-	if(!empty($fgs)){
-		foreach($fgs as $fg)
-			$GruppiSel[]=$fg->term_id;
+	if ($IDUser==-1){
+		get_currentuserinfo();
+		$IDUser=$current_user->ID;
 	}
-	$GruppoUtente=get_user_meta($IDUser, "gruppo", true);
-	if (in_array($GruppoUtente,$GruppiSel))
+	$Vis=FALSE;
+	$DestTutti=get_option('Circolari_Visibilita_Pubblica');
+	if($DestTutti===FALSE)
+		$DestTutti=-1;
+	$dest=wp_get_post_terms( $IDCircolare, 'gruppiutenti', array("fields" => "ids") ); 
+	if (in_array($DestTutti,$dest))
 		$Vis=TRUE;
-	}
-return $Vis;
+	else{
+		$fgs = wp_get_object_terms($IDCircolare, 'gruppiutenti');
+		$GruppiSel=array();
+		if(!empty($fgs)){
+			foreach($fgs as $fg)
+				$GruppiSel[]=$fg->term_id;
+		}
+		$GruppoUtente=get_user_meta($IDUser, "gruppo", true);
+		if (in_array($GruppoUtente,$GruppiSel))
+			$Vis=TRUE;
+		}
+	return $Vis;
 }
+
 function FirmaCircolare($IDCircolare,$Pv=-1){
 	global $wpdb, $current_user;
 	get_currentuserinfo();
