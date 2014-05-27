@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.0
+ * @ver 2.0.1
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -102,7 +102,7 @@ function GetNumCircolariFirmate($Tipo="N"){
 function GetNumCircolariDaFirmare($Tipo="N"){
 	global $wpdb;
 	$Sql="SELECT *
-		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON wp_posts.ID = $wpdb->postmeta.post_id)
+		 	FROM ($wpdb->posts INNER JOIN $wpdb->postmeta ON $wpdb->posts.ID = $wpdb->postmeta.post_id)
 			WHERE $wpdb->posts.post_type = 'circolari' AND 
 				  $wpdb->posts.post_status = 'publish' AND 
 				  $wpdb->posts.ID IN (
@@ -111,7 +111,7 @@ function GetNumCircolariDaFirmare($Tipo="N"){
 							WHERE ($wpdb->postmeta.meta_key = '_firma' AND $wpdb->postmeta.meta_value = 'Si')
 							       OR ($wpdb->postmeta.meta_key = '_sciopero' AND $wpdb->postmeta.meta_value = 'Si')
 							       )
-						GROUP BY post_id";
+						GROUP BY $wpdb->postmeta.post_id";
 	$ris=$wpdb->get_results($Sql);
 	if (empty($ris))
 		return 0;	
