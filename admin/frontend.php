@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 2.0.1
+ * @since 2.1
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -42,7 +42,7 @@ $args = array( 'category' => $IdCircolari,
 			   'post_status' => 'publish');
 $Circolari = get_posts($args);
 if (empty($Circolari)){
-	$Contenuto.='<h3>Non risultano circolari per l\'anno '.$annocorrente.' mese '.$mesecorrente.'verranno visualizzate le ultime 5 codificate</h3>';
+	$Contenuto.='<h3>Non risultano circolari per '.circ_MeseLettere($mesecorrente).' '.$annocorrente.' verranno visualizzate le ultime 5</h3>';
 	$args = array( 'category' => $IdCircolari,
 		       'post_type' => array('post','circolari'),
 			   'posts_per_page'  => 5,
@@ -68,9 +68,12 @@ foreach($Circolari as $post) {
 		}
 		$Contenuto.='
 		<div style="margin-bottom:5px;padding:3px;">';
+		$numero=get_post_meta($post->ID, "_numero",TRUE);
+		$anno=get_post_meta($post->ID, "_anno",TRUE);
 		$Contenuto.='
-			<h4>'.FormatDataItaliano($post->post_date).' - <a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a>
+			<h4><a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a>
 			</h4>
+			<div style="font-weight: bold;font-size:0.8em;margin-top:3px;">Del '.FormatDataItaliano($post->post_date).' Numero '.$numero.'_'.$anno.'</div> 
 			<div style="height:30px;">
 				<div style="display:inline;">
 					<img src="'.Circolari_URL.'img/tipo.png" style="border:0;" alt="Icona tipo post" />
@@ -99,23 +102,46 @@ foreach($Circolari as $post) {
 				<div style="display:inline;vertical-align:top;">
 					<p style="font-style:italic;font-size:0.8em;display:inline;margin-top:3px;">Contenuto Protetto</p>
 				</div>';	
-		if (Is_Circolare_per_User($post->ID))
+//		if (Is_Circolare_per_User($post->ID))
 			if (Is_Circolare_Da_Firmare($post->ID))
 				if (!Is_Circolare_Firmata($post->ID)) {
+					$ngiorni=Get_scadenzaCircolare($post->ID,"",True);
+					switch ($ngiorni){
+						case 0:
+							$entro="entro OGGI";
+							break;
+						case 1:
+							$entro="entro DOMANI";
+							break;
+						default:
+							$entro="entro $ngiorni giorni";
+							break;
+					}
 					if (get_post_meta($post->ID, "_sciopero",TRUE)=="Si")
-					$Tipo="Esprimere adesione";
-				else
-				if (get_post_meta($post->ID, "_firma",TRUE)=="Si")
-					$Tipo="Firmare";
-				$Contenuto.='
+						$Tipo="Esprimere adesione $entro";
+					else
+						if (get_post_meta($post->ID, "_firma",TRUE)=="Si")
+							$Tipo="Firmare $entro";
+					$Contenuto.='
 					<div style="display:inline;">
 						<img src="'.Circolari_URL.'/img/firma.png" style="border:0;" alt="Icona firma o presa visione"/>
 					</div>
 					<div style="display:inline;vertical-align:top;">
 						<p style="font-style:italic;font-size:0.8em;display:inline;margin-top:3px;color:red;">'.$Tipo.'</p>
 					</div>';	
+			}
+		if (Is_Circolare_Da_Firmare($post->ID,True)){
+				if (!Is_Circolare_Firmata($post->ID))
+					if(Is_Circolare_Scaduta($post->ID))
+						$Contenuto.='
+						<div style="display:inline;">
+							<img src="'.Circolari_URL.'/img/firma.png" style="border:0;" alt="Icona firma o presa visione"/>
+						</div>
+						<div style="display:inline;vertical-align:top;">
+							<p style="font-style:italic;font-size:0.8em;display:inline;margin-top:3px;color:red;">Scaduta e non Firmata</p>
+						</div>';	
 		}
-		$Contenuto.='	
+			$Contenuto.='	
 			</div>
 			<div style="margin-bottom:5px;">
 				<em>'.$riassunto .'</em>

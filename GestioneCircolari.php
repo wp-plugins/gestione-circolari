@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.0.1
+Version:2.1
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -69,6 +69,17 @@ add_shortcode('VisCircolari', 'VisualizzaCircolari');
 add_action('wp_head', 'TestataCircolari' );
 add_action( 'admin_enqueue_scripts',  'Circoalri_Admin_Enqueue_Scripts' );
 
+add_action('do_feed', 'circolari_disable_feed', 1);
+add_action('do_feed_rdf', 'circolari_disable_feed', 1);
+add_action('do_feed_rss', 'circolari_disable_feed', 1);
+add_action('do_feed_rss2', 'circolari_disable_feed', 1);
+add_action('do_feed_atom', 'circolari_disable_feed', 1);
+ 
+function circolari_disable_feed() {
+	if ( get_post_type()=='circolari') {
+        wp_die( 'Non ci sono feed disponibili per le Circolari, per visualizzarle naviga la  <a href="'. get_bloginfo('url') .'">Home</a> del sito!');
+    }
+}
 /*register_deactivation_hook( __FILE__, 'deactivate') );	
 
 function my_posts_request_filter( $input ) {
@@ -94,7 +105,15 @@ add_filter( 'posts_where' , 'posts_where' );
 */
 function Circoalri_Admin_Enqueue_Scripts( $hook_suffix ) {
 	wp_enqueue_script('jquery');
+	wp_enqueue_script( 'jquery-ui-datepicker', '', array('jquery'));
 	wp_enqueue_script( 'Circolari-admin', plugins_url('js/Circolari.js', __FILE__ ));
+	wp_enqueue_style( 'jquery.ui.theme', plugins_url( 'css/jquery-ui-custom.css', __FILE__ ) );
+
+	wp_enqueue_script( 'Circolari-DataTable', plugins_url('js/jquery.dataTables.js', __FILE__ ));
+	wp_enqueue_script( 'Circolari-DataTable-Tools', plugins_url('js/dataTables.tableTools.js', __FILE__ ));
+
+	wp_enqueue_style( 'Circolari-DataTable-theme', plugins_url( 'css/jquery.dataTables.css', __FILE__ ) );
+	wp_enqueue_style( 'Circolari-DataTable-theme-Tools', plugins_url( 'css/dataTables.tableTools.css', __FILE__ ) );
 }
 
 function search_filter($query) {
@@ -188,8 +207,8 @@ function circolari_activate() {
 	if(get_option('Circolari_Categoria')== ''||!get_option('Circolari_Categoria')){
 		add_option('Circolari_Categoria', '0');
 	}
-	if(get_option('Circolari_NumPerPag')== ''||!get_option('Circolari_NumPerPag')){
-		add_option('Circolari_NumPerPag', '10');
+	if(get_option('Circolari_GGScadenza')== ''||!get_option('Circolari_GGScadenza')){
+		add_option('Circolari_GGScadenza', '30');
 	}
 	$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->table_firme_circolari." (
   			post_ID  bigint(20) NOT NULL,
@@ -204,7 +223,7 @@ function circolari_activate() {
 	
 function add_circolari_menu_bubble() {
   global $menu;
-  $NumCircolari=GetNumCircolariDaFirmare("N");
+  $NumCircolari=GetCircolariDaFirmare("N");
   if ($NumCircolari==0)
 	return;
   $i=0;
@@ -222,9 +241,61 @@ function circolari_add_menu(){
    $pageFirma=add_submenu_page( 'edit.php?post_type=circolari', 'Firma',  'Firma', 'read', 'Firma', 'circolari_GestioneFirme');
    add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
    $pageFirmate=add_submenu_page( 'edit.php?post_type=circolari', 'Firmate',  'Firmate', 'read', 'Firmate', 'circolari_VisualizzaFirmate');
-   add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
+   add_action( 'admin_head-'. $pageFirmate, 'TestataCircolari' );
+   $pagenFirmate=add_submenu_page( 'edit.php?post_type=circolari', 'Scadute e non Firmate', 'Scadute e non Firmate', 'read', 'non_Firmate', 'circolari_VisualizzaNonFirmate');
+   add_action( 'admin_head-'. $pagenFirmate, 'TestataCircolari' );
+   $utility=add_submenu_page( 'edit.php?post_type=circolari', 'Utility',  'Utility', 'manage_options', 'Utility', 'circolari_Utility');
+   add_action( 'admin_head-'. $utility, 'TestataCircolari' );
 }
 
+function circolari_Utility($Stato=""){
+echo '<div class="wrap">
+	<img src="'.Circolari_URL.'/img/utility.png" alt="Icona Permessi" style="display:inline;float:left;margin-top:5px;"/>
+		<h2 style="margin-left:40px;">Utility Circolari</h2>';
+if ($Stato!="") 
+	echo '<div id="message" class="updated"><p>'.str_replace("%%br%%","<br />",$Stato).'</p></div>
+      <meta http-equiv="refresh" content="5;url=admin.php?page=utility"/>';
+echo '		</div> 
+		<p></p>
+		<div class="widefat" style="padding:10px;">
+				<p style="text-align:center;font-size:1.5em;font-weight: bold;">
+				Verifica procedura
+				</p>
+				<p style="text-align:left;font-size:1em;font-style: italic;">
+Questa procedura esegue un test generale della procedura e riporta eventuali anomalie nei dati e nelle impostazioni.</spam><br />Operazioni eseguite:</p>
+<p style="font-size:1em;font-style: italic;margin-left:10px;font-weight: bold;">
+Verifica data scadenza firma <spam style="text-align:center;font-size:1.5em;font-weight: bold;"> <a href="edit.php?post_type=circolari&page=Utility&action=versca">Verifica</a></spam>
+</p>';
+		$lista="";
+		if (isset($_GET['action']) && $_GET['action']=="versca"){
+			$GGscadenza=get_option("Circolari_GGScadenza");
+			$Posts = get_posts('post_type=circolari&numberposts=-1');
+			foreach($Posts as $post){
+				$Adesione=get_post_meta($post->ID, "_sciopero",TRUE);
+				$firma=get_post_meta($post->ID, "_firma",TRUE);
+				$scadenza=get_post_meta($post->ID, "_scadenza",TRUE);
+				if ((!empty($Adesione) or !empty($firma)) and empty($scadenza)){
+	 				$lista.="			<li>$post->ID $post->post_title $post->post_date_gmt";
+	 				if (isset($_GET['opt']) && $_GET['opt']=="aggsca"){
+	 					$Scadenza=date('Y-m-d', strtotime(substr($post->post_date_gmt,0,10). " + $GGscadenza days"));
+	 					if (update_post_meta($post->ID,"_scadenza",$Scadenza ))
+	 						$lista.= ' <img src="'.Circolari_URL.'/img/verificato.png" alt="Icona Permessi" style="display:inline;margin-left:5px;"/>';
+	 				}
+				$lista.= "</li>";					
+				}
+			}
+			if (!empty($lista)){
+				echo "<h4>Circolari da firmare senza data di scadenza</h4>
+		<ul>
+				$lista
+		</ul>";
+			echo '<p style="text-align:left;font-size:1em;font-style: italic;">Aggiorna Data entro cui firmare = Datapubblicazione + '. $GGscadenza .' giorni <spam style="text-align:center;font-size:1.5em;font-weight: bold;"> <a href="edit.php?post_type=circolari&page=Utility&action=versca&opt=aggsca">Aggiorna</a></spam>
+</p>
+</div>';			
+		}else
+			echo "<h4>Tutte le circolari da firmare hanno la data di scadenza</h4>";
+	}
+}
 function TestataCircolari() {
 ?>
 <script type='text/javascript'>
@@ -343,6 +414,7 @@ echo '<div class="wrap">
 }
 function circolari_Parametri(){
 	$DestTutti  =  get_option('Circolari_Visibilita_Pubblica');
+	$GiorniScadenza  =  get_option('Circolari_GGScadenza');
 echo'
 <div class="wrap">
 	  	<img src="'.Circolari_URL.'/img/opzioni32.png" alt="Icona configurazione" style="display:inline;float:left;margin-top:10px;"/>
@@ -369,9 +441,9 @@ echo'</select></td>
 echo'			</td>				
 		</tr>
 		<tr valign="top">
-			<th scope="row"><label for="numcircolarifirma">Numero Circolari da visualizzare per pagina</label></th>
+			<th scope="row"><label for="GGScadenza">N. giorni entro cui firmare di default</label></th>
 			<td>
-				<input type="text" name="NCircolariPF" id="NCircolariPF" size="3" maxlength="3" value="'.get_option('Circolari_NumPerPag').'" />
+				<input type="text" name="GGScadenza" id="GGScadenza" size="3" maxlength="3" value="'.$GiorniScadenza.'" />
 			</td>				
 		</tr>
 	</table>
@@ -386,7 +458,7 @@ function update_Impostazioni_Circolari(){
     if($_POST['Circolari_submit_button'] == 'Salva Modifiche'){
 	    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
 	    update_option('Circolari_Categoria',$_POST['Categoria'] );
-	    update_option('Circolari_NumPerPag',$_POST['NCircolariPF'] );
+	    update_option('Circolari_GGScadenza',$_POST['GGScadenza'] );
 		header('Location: '.get_bloginfo('wpurl').'/wp-admin/edit.php?post_type=circolari'); 
 	}
 }
@@ -397,6 +469,7 @@ function circolari_NuoveColonne($defaults) {
 		$defaults['numero'] = 'Numero';  
 //	    $defaults['destinatari'] = 'Destinatari';
 		$defaults['firme'] = 'Firme';    
+		$defaults['scadenza'] = 'Firmare entro'; 
 	    $defaults['gestionecircolari'] = 'Gestione';  
 	}
    return $defaults;  
@@ -425,9 +498,13 @@ function circolari_NuoveColonneContenuto($column_name, $post_ID) {
 			echo $Linkfirma;
 	     } 
 		 if ($column_name == 'numero'){
-		 	$numero=get_post_meta($post_ID, "_numero");
-			$anno=get_post_meta($post_ID, "_anno");
-			echo $numero[0].'/'.$anno[0];
+		 	$numero=get_post_meta($post_ID, "_numero",TRUE);
+			$anno=get_post_meta($post_ID, "_anno",TRUE);
+			echo $numero.'_'.$anno;
+		 }
+		 if ($column_name == 'scadenza'){
+		 	$scadenza=FormatDataItalianoBreve(get_post_meta($post_ID, "_scadenza",TRUE));
+			echo $scadenza;
 		 }
 		 if ($column_name == 'firme'){
 		 	$dest=wp_get_post_terms( $post_ID, 'gruppiutenti', array("fields" => "ids") ); 
@@ -469,7 +546,6 @@ function crea_custom_circolari() {
    'capability_type' => 'post',
    'hierarchical' => false,
    'has_archive' => true,
-   
    'menu_icon' => plugins_url( 'img/circolare.png', __FILE__ ),
 //   'taxonomies' => array('category'),  
    'supports' => array('title', 'editor', 'author','excerpt')));
@@ -478,7 +554,7 @@ function crea_custom_circolari() {
 
 function circolari_admin_bar_render() {
 	global $wp_admin_bar;
-	$NumCircolari=GetNumCircolariDaFirmare("N");
+	$NumCircolari=GetCircolariDaFirmare("N");
 	if ($NumCircolari>0)
 		$VisNumCircolari=' <span style="background-color:red;">&nbsp;'.$NumCircolari.'&nbsp;</span>';
 	else
@@ -531,6 +607,11 @@ function circolari_salva_dettagli( $post_id ){
 				$DestTutti=get_option('Circolari_Visibilita_Pubblica');
 				wp_set_object_terms( $post_id, (int)$DestTutti,"gruppiutenti",FALSE );
 			}
+			if ($_POST["scadenza"])
+				update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"]));
+			else{
+				update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"],get_option('Circolari_GGScadenza')));
+			}
 			update_post_meta( $post_id, '_numero', $_POST["numero"]);
 			update_post_meta( $post_id, '_anno', $_POST["anno"]);
 			update_post_meta( $post_id, '_firma', $_POST["firma"]);
@@ -540,47 +621,51 @@ function circolari_salva_dettagli( $post_id ){
 		}
 }
 function circolari_crea_box(){
-  add_meta_box('prog', 'Progressivo', 'circolari_crea_box_progressivo', 'circolari', 'advanced', 'high');
+  add_meta_box('parametri', 'Parametri Circolari', 'circolari_crea_box_parametri', 'circolari', 'advanced', 'high');
+
+/*  add_meta_box('prog', 'Progressivo', 'circolari_crea_box_progressivo', 'circolari', 'advanced', 'high');
   add_meta_box('firma', 'Richiesta Firma', 'circolari_crea_box_firma', 'circolari', 'advanced', 'high');
   add_meta_box('sciopero', 'Circolare comunicazione Sciopero', 'circolari_crea_box_firma_sciopero', 'circolari', 'advanced', 'high');
-  add_meta_box('visibilita', 'Visibilit&agrave;', 'circolari_crea_box_visibilita', 'circolari', 'advanced', 'high');
+  add_meta_box('visibilita', 'Visibilit&agrave;', 'circolari_crea_box_visibilita', 'circolari', 'advanced', 'high');*/
 }
 
-function NewNumCircolare(){
-	global $wpdb,$table_prefix;
+function circolari_crea_box_parametri( $post ){
+echo "<h4>Firmare entro</h4>";	
+circolari_crea_box_data_scadenza($post);
+echo "<h4>Progessivo</h4>";
+circolari_crea_box_progressivo($post);
+echo "<h4>Firme</h4>";
+circolari_crea_box_firma($post);
+circolari_crea_box_firma_sciopero($post);
+echo "<h4>Visibilit&agrave;</h4>";
+circolari_crea_box_visibilita($post);
+}
 
-	$Sql='SELECT wp_posts.ID
-			FROM '.$wpdb->posts. '
-			INNER JOIN '.$wpdb->postmeta. ' ON '.$wpdb->posts. '.ID = '.$wpdb->postmeta. '.post_id
-			WHERE post_type = %s 
-		     AND post_status = %s 
-			 AND meta_key = %s 
-			 AND meta_value = %d;';
-//echo $wpdb->prepare($Sql,"circolari","publish","_anno",2013);
-	$ris=$wpdb->get_results($wpdb->prepare($Sql,"circolari","publish","_anno",2013),'ARRAY_N');
-	$p_ids=array();
-	foreach($ris as $r){
-		$p_ids[]=$r[0];
-	}
-	$psel=implode(",",$p_ids);
-	$Sql='SELECT max(meta_value * 1)
-		 	FROM '.$wpdb->posts. '
-			INNER JOIN '.$wpdb->postmeta. ' ON '.$wpdb->posts. '.ID = '.$wpdb->postmeta. '.post_id
-			WHERE ID in ('.$psel.') and meta_key="_numero";';
-//echo $Sql;
-	return $wpdb->get_var($Sql)+1;
+function NewNumCircolare($numero){
+	$args = array( 'numberposts' => '1','post_type'=> 'circolari','post_status' => 'publish','meta_key' => '_anno','meta_value' => $numero);
+	$ultimo=wp_get_recent_posts($args);
+	$ID=$ultimo[0]['ID'];
+	$numero=get_post_meta($ID, "_numero");
+	return $numero[0]+1;
 }
 function circolari_crea_box_progressivo( $post ){
 $numero=get_post_meta($post->ID, "_numero");
 $anno=get_post_meta($post->ID, "_anno");
 $anno=$anno[0];
 $numero=$numero[0];
-if ($anno=="" or !$anno)
+if ($anno=="" or !$anno){
 	$anno=date("Y");
+	if (date("n")>8)
+		$anno=$anno."/".date("y")+1;
+	else	
+		$anno=($anno-1)."/".date("y");
+}
+	
 if ($numero=="" or !$numero)
-	$numero=NewNumCircolare();
+	$numero=NewNumCircolare($anno);
 echo '<label>Numero/Anno</label>
-	<input type="text" name="numero" value="'.$numero.'" size="5" style="text-align:right"/>/ <input type="text" name="anno" value="'.$anno.'" size="4"/>' ;
+	<input type="text" name="numero" value="'.$numero.'" size="5" style="text-align:right"/>_<input type="text" name="anno" value="'.$anno.'" size="5"/>
+	<br />' ;
 }
 
 function circolari_crea_box_visibilita( $post ){
@@ -592,9 +677,8 @@ else
 		$selp='checked="checked"';
 	else	
 		$seld='checked="checked"';
-echo '<legend>Indicare chi potr&agrave; visualizzare la circolare</legend>
-Pubblica <input type="radio" name="visibilita" value="p" '.$selp.'/>
-Solo destinatari <input type="radio" name="visibilita" value="d" '.$seld.'/>';
+echo 'Pubblica <input type="radio" name="visibilita" value="p" '.$selp.'/><br />
+Privata&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="visibilita" value="d" '.$seld.'/>';
 //$term_list = wp_get_post_terms($post->ID, 'gruppiutenti', array("fields" => "names"));
 //print_r($term_list);
 }
@@ -602,156 +686,124 @@ function circolari_crea_box_firma( $post ){
 $firma=get_post_meta($post->ID, "_firma");
 if($firma[0]=="Si")
 	$firma='checked="checked"';
- echo "<label>E' richiesta la firma alla circolare</label>
-	<input type='checkbox' name='firma' value='Si' $firma />" ;
+ echo "<label>E' richiesta la firma</label>
+	<input type='checkbox' name='firma' value='Si' $firma />
+	<br />" ;
 }
 function circolari_crea_box_firma_sciopero( $post ){
 $sciopero=get_post_meta($post->ID, "_sciopero");
 if($sciopero[0]=="Si")
 	$sciopero='checked="checked"';
- echo "<label>La circolare si riferisce ad uno sciopero, bisogna indicare l'adesione o la presa visione</label>
-	<input type='checkbox' name='sciopero' value='Si' $sciopero />" ;
+ echo "<label>Circolare sindacale</label>
+	<input type='checkbox' name='sciopero' value='Si' $sciopero />
+	<br />" ;
 }
 
+function circolari_crea_box_data_scadenza( $post ){
+$scadenza=FormatDataItalianoBreve(get_post_meta($post->ID, "_scadenza",TRUE));
+echo "<label>Data</label> <input type='text' name='scadenza' value='".$scadenza."' size='8' style='text-align:left' id='DataScadenza'/>
+	<br />" ;
+}
 
 function circolari_VisualizzaFirme($post_id,$Tipo=0){
-global $GestioneScuola;
-$numero=get_post_meta($post_id, "_numero");
-$anno=get_post_meta($post_id, "_anno");
-$circolare=get_post($post_id);
-// Inizio interfaccia
-echo' 
-<div class="wrap">
-	      <img src="'.Circolari_URL.'/img/firma24.png" alt="Icona Atti" style="display:inline;float:left;margin-top:10px;"/>
-		  
-<h2 style="margin-left:40px;">Circolare n°'.$numero[0].'/'.$anno[0].'<br /><strong>'.$circolare->post_title.'</strong></h2>
-<div id="col-container">
-	<div class="col-wrap">';
-$globale=get_post_meta($post_id, '_visibilita_generale');
-$fgs = wp_get_object_terms($post_id, 'gruppiutenti');
-if(!empty($fgs)){
-	foreach($fgs as $fg){
-		$Elenco.="<em>".$fg->name."</em> - ";
+	global $GestioneScuola;
+	$numero=get_post_meta($post_id, "_numero");
+	$anno=get_post_meta($post_id, "_anno");
+	$circolare=get_post($post_id);
+	// Inizio interfaccia
+	echo' 
+	<div class="wrap">
+		<img src="'.Circolari_URL.'/img/firma24.png" alt="Icona Atti" style="display:inline;float:left;margin-top:10px;"/>  
+		<h2 style="margin-left:40px;">Circolare n°'.$numero[0].'_'.$anno[0].'<br /><strong>'.$circolare->post_title.'</strong></h2>';
+	$globale=get_post_meta($post_id, '_visibilita_generale');
+	$fgs = wp_get_object_terms($post_id, 'gruppiutenti');
+	if(!empty($fgs)){
+		foreach($fgs as $fg){
+			$Elenco.="<em>".$fg->name."</em> - ";
+		}
+		$Elenco=substr($Elenco,0,strlen($Elenco)-3);
 	}
-	$Elenco=substr($Elenco,0,strlen($Elenco)-3);
-}
-echo'
-<div style="display:inline;">
-	<img src="'.Circolari_URL.'img/destinatari.png" style="border:0;" alt="Icona destinatari"/>
-</div>
-<div style="display:inline;vertical-align:top;">
-	<p style="font-style:italic;font-weight:bold;display:inline;margin-top:3px;">'.$Elenco.'</p>
-</div>	
-';
-$utenti=Get_Users_per_Circolare($post_id);
-if ($Tipo==1)
-	$sottrai=1;
-else	
-	$sottrai=0;
-$NumUtentiFirme =count($utenti);
-//echo $NumUtentiFirme;
-//print_r($utenti);
-$NumPagine=intval($NumUtentiFirme/10);	
-if ($NumPagine<$NumUtentiFirme/10)
-	$NumPagine++;
-$OSPag=0;
-if ($NumPagine>1){
-	$mTop="0";
-	if (!isset($_GET['npag'])){
-		$CurPage=1;
-		$OSPag=0;
-	}else{
-		$OSPag=($_GET['npag']-1)*10;
-		$CurPage=$_GET['npag'];
-	}
-	if ($CurPage==1){
-		$Dietro=" disabled";
-		$Pre=1;	
-	}else{
-		$Dietro="";
-		$Pre=$CurPage-1;			
-	}
-	if ($CurPage==$NumPagine){
-		$Avanti=" disabled";
-		$Suc=$NumPagine;
-	}else{
-		$Avanti="";
-		$Suc=$CurPage+1;
-	}
-
-	echo '
-	<h2 style="text-align:center;">Elenco firme</h2>
-	<div class="tablenav top">
-		<div class="tablenav-pages">
-			<span class="displaying-num">'.$NumUtentiFirme.' circolari</span>
-			<span class="pagination-links">
-				<a class="first-page'.$Dietro.'" title="Vai alla prima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'">&laquo;</a>
-				<a class="prev-page'.$Dietro.'" title="Torna alla pagina precedente." href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$Pre.'">&lsaquo;</a>
-			<span class="paging-input">
-				<input class="current-page" title="Pagina corrente." type="text" name="paged" value="'.$CurPage.'" size="2" /> di <span class="total-pages">'.$NumPagine.'</span>
-			</span>
-				<a class="next-page'.$Avanti.'" title="Vai alla pagina successiva" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$Suc.'">&rsaquo;</a>
-				<a class="last-page'.$Avanti.'" title="Vai all&#039;ultima pagina" href="'.get_bloginfo("wpurl").'/wp-admin/edit.php?post_type=circolari&page=circolari&op=Firme&post_id='.$_GET['post_id'].'&npag='.$NumPagine.'">&raquo;</a>
-			</span>
+	echo'
+		<div style="display:inline;">
+			<img src="'.Circolari_URL.'img/destinatari.png" style="border:0;" alt="Icona destinatari"/>
 		</div>
-	</div>';
-}else{
-	$mTop="20";
-}
-echo '
-<div>
-	<table class="widefat">
-		<thead>
-			<tr>
-				<th style="width:'.(20-$sottrai).'%;">User login</th>
-				<th style="width:'.(30-$sottrai).'%;">Cognome</th>
-				<th style="width:'.(15-$sottrai).'%;">Gruppo</th>
-				<th style="width:'.(15-$sottrai).'%;">Data Firma</th>';
-if ($Tipo==1)
+		<div style="display:inline;vertical-align:top;">
+			<p style="font-style:italic;font-weight:bold;display:inline;margin-top:3px;">'.$Elenco.'</p>
+		</div>	
+	</div>
+	';
+	$utenti=Get_Users_per_Circolare($post_id);
+	if ($Tipo==1)
+		$sottrai=3;
+	else	
+		$sottrai=0;
+	$NumUtentiFirme =count($utenti);
 	echo '
-				<th style="width:12%;">Adesione</th>';				
-echo '
-				<th>IP</th>
-			</tr>
-		</thead>
-		<tboby>';
-for($i=$OSPag;$i<$OSPag+10 And $i<count($utenti);$i++){
-	$utente=$utenti[$i];
-	$GruppoUtente=get_user_meta($utente->ID, "gruppo", true);
-	$firma=get_Firma_Circolare($post_id,$utente->ID);
-	$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => 0,'include'=>$GruppoUtente));
-	echo '
+	<div>
+		<table  id="TabellaCircolari" class="widefat"  cellspacing="0" width="99%">
+			<thead>
 				<tr>
-					<td>'.$utente->user_login.'</td>
-					<td>'.$utente->display_name.'</td>
-					<td>'.$gruppiutenti[0]->name.'</td>
-					<td>'.$firma->datafirma.'</td>';
-	if ($Tipo==1){
-		switch ($firma->adesione){
-			case 1:
-				$desad="Si";
-				break;
-			case 2:
-				$desad="No";
-				break;
-			case 3:	
-				$desad="Presa Visione";
-				break;
-			default:
-				$desad="Non Firmata";
+					<th style="width:'.(20-$sottrai).'%;">User login</th>
+					<th style="width:'.(30-$sottrai).'%;" id="ColOrd" sorted="1">Cognome</th>
+					<th style="width:'.(15-$sottrai).'%;">Gruppo</th>
+					<th style="width:'.(15-$sottrai).'%;">Data Firma</th>';
+	if ($Tipo==1)
+		echo '
+					<th style="width:12%;">Adesione</th>';				
+	echo '
+					<th>IP</th>
+				</tr>
+			</thead>
+			<tfoot>
+				<tr>
+					<th style="width:'.(20-$sottrai).'%;">User login</th>
+					<th style="width:'.(30-$sottrai).'%;">Cognome</th>
+					<th style="width:'.(15-$sottrai).'%;">Gruppo</th>
+					<th style="width:'.(15-$sottrai).'%;">Data Firma</th>';
+	if ($Tipo==1)
+		echo '
+					<th style="width:12%;">Adesione</th>';				
+	echo '
+					<th>IP</th>
+				</tr>
+			</tfoot>
+			<tboby>';
+	foreach($utenti as $utente){
+		$GruppoUtente=get_user_meta($utente->ID, "gruppo", true);
+		$firma=get_Firma_Circolare($post_id,$utente->ID);
+		$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => 0,'include'=>$GruppoUtente));
+		echo '
+					<tr>
+						<td>'.$utente->user_login.'</td>
+						<td>'.$utente->display_name.'</td>
+						<td>'.$gruppiutenti[0]->name.'</td>
+						<td>'.$firma->datafirma.'</td>';
+		if ($Tipo==1){
+			switch ($firma->adesione){
+				case 1:
+					$desad="Si";
+					break;
+				case 2:
+					$desad="No";
+					break;
+				case 3:	
+					$desad="Presa Visione";
+					break;
+				default:
+					$desad="Non Firmata";
+			}
+			echo '
+						<td>'.$desad.'</td>';
 		}
 		echo '
-					<td>'.$desad.'</td>';
+						<td>'.$firma->ip.'</td>
+					</tr>';
 	}
-	echo '
-					<td>'.$firma->ip.'</td>
-				</tr>';
-}
-echo'
-			</tbody>
-		</table>
-</div>
-';
+	echo'
+				</tbody>
+			</table>
+	</div>
+	';
 }	
 
 ?>
