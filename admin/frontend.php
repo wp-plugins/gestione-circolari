@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 2.1
+ * @since 2.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -105,9 +105,8 @@ foreach($Circolari as $post) {
 //		if (Is_Circolare_per_User($post->ID))
 			if (Is_Circolare_Da_Firmare($post->ID))
 				if (!Is_Circolare_Firmata($post->ID)) {
-					$ngiorni=Get_scadenzaCircolare($post->ID,"",True);
-					switch ($ngiorni){
-						case 0:
+					$ngiorni=Get_scadenzaCircolare($post->ID,"",True);					switch ($ngiorni){
+						case -1:							$entro="";							break;													case 0:
 							$entro="entro OGGI";
 							break;
 						case 1:

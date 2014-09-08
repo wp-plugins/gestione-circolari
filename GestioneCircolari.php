@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.1
+Version:2.2
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -106,7 +106,7 @@ add_filter( 'posts_where' , 'posts_where' );
 function Circoalri_Admin_Enqueue_Scripts( $hook_suffix ) {
 	wp_enqueue_script('jquery');
 	wp_enqueue_script( 'jquery-ui-datepicker', '', array('jquery'));
-	wp_enqueue_script( 'Circolari-admin', plugins_url('js/Circolari.js', __FILE__ ));
+	wp_enqueue_script( 'Circolari-admin', plugins_url('js/Circolari.js', __FILE__ ), array(), null);
 	wp_enqueue_style( 'jquery.ui.theme', plugins_url( 'css/jquery-ui-custom.css', __FILE__ ) );
 
 	wp_enqueue_script( 'Circolari-DataTable', plugins_url('js/jquery.dataTables.js', __FILE__ ));
@@ -562,7 +562,7 @@ function circolari_admin_bar_render() {
 	$wp_admin_bar->add_menu( array(
 		'id' => 'fc', // link ID, defaults to a sanitized title value
 		'title' => 'Circolari '.$VisNumCircolari, // link title
-		'href' => home_url().'/wp-admin/edit.php?post_type=circolari&page=Firma', // name of file
+		'href' => site_url().'/wp-admin/edit.php?post_type=circolari&page=Firma', // name of file
 		'meta' => array(  'title' => 'Circolari da Firmare' )));
 }
 
@@ -653,14 +653,7 @@ $numero=get_post_meta($post->ID, "_numero");
 $anno=get_post_meta($post->ID, "_anno");
 $anno=$anno[0];
 $numero=$numero[0];
-if ($anno=="" or !$anno){
-	$anno=date("Y");
-	if (date("n")>8)
-		$anno=$anno."/".date("y")+1;
-	else	
-		$anno=($anno-1)."/".date("y");
-}
-	
+if ($anno=="" or !$anno){	$anno=date("Y");	$canno=strval(date("y"))+1;	if (date("n")>8)		$anno=$anno."/".$canno;	else			$anno=($anno-1)."/".date("y");}
 if ($numero=="" or !$numero)
 	$numero=NewNumCircolare($anno);
 echo '<label>Numero/Anno</label>

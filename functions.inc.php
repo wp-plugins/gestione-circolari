@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.1
+ * @ver 2.2
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -59,8 +59,11 @@ function Is_Circolare_Da_Firmare($IDCircolare,$Tutte=False){
 	$destinatari=Get_Users_per_Circolare($IDCircolare,"ID");
 	$DaFirmare=get_post_meta( $IDCircolare, "_firma",true);
 	$PresaVisione=get_post_meta( $IDCircolare, "_sciopero",true);
-	if (!$Tutte)
+	if (!$Tutte){
 		$Scadenza=get_post_meta( $IDCircolare, "_scadenza",true);
+		if(!$Scadenza)
+			$Scadenza=date("Y-m-d");
+	}
 	else
 		$Scadenza=$ora;
 	if (in_array($current_user->ID,$destinatari) and (($DaFirmare=="Si" or $PresaVisione=="Si") and $Scadenza>=$ora))
@@ -76,7 +79,7 @@ function Is_Circolare_Scaduta($IDCircolare){
 	$destinatari=Get_Users_per_Circolare($IDCircolare,"ID");
 	$DaFirmare=get_post_meta( $IDCircolare, "_firma",true);
 	$PresaVisione=get_post_meta( $IDCircolare, "_sciopero",true);
-	$Scadenza=get_post_meta( $IDCircolare, "_scadenza",true);
+	$Scadenza=get_post_meta( $IDCircolare, "_scadenza",true);		if (!$Scadenza){		return FALSE;	}
 	if (in_array($current_user->ID,$destinatari) and (($DaFirmare=="Si" or $PresaVisione=="Si") and $Scadenza<$ora))
 		return TRUE;
 	else
@@ -85,6 +88,9 @@ function Is_Circolare_Scaduta($IDCircolare){
 
 function Get_scadenzaCircolare($ID,$TipoRet="Data",$Giorni=False){
 	$Scadenza=get_post_meta( $ID, "_scadenza",true);
+	if (!$Scadenza){
+		$Scadenza=date("Y-m-d");		if ($Giorni){			return -1;		}
+	}
 	if ($Giorni){
 //		echo "in giorni ";
 		$seconds_diff = strtotime($Scadenza) - strtotime(date("Y-m-d"));
@@ -167,8 +173,10 @@ function GetCircolariDaFirmare($Tipo="N"){
 		$Circolari=array();
 	foreach($ris as $riga){
 		if (Is_Circolare_Da_Firmare($riga->ID,True)){
-			$Scaduta=Get_scadenzaCircolare($riga->ID,"DataDB")<date("Y-m-d")?TURE:FALSE;
+			$Scaduta=Get_scadenzaCircolare($riga->ID,"DataDB")<date("Y-m-d")?TRUE:FALSE;
+//			echo $riga->ID." ".var_dump($Scaduta);
 			$Firmata=Is_Circolare_Firmata($riga->ID);
+//			echo var_dump($Firmata)." <br />";
 			if (!$Firmata and !$Scaduta){
 				if ($Tipo=="N")
 					$Circolari++;
