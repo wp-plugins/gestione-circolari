@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.2
+ * @ver 2.2.1
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
@@ -42,7 +42,9 @@ function visualizza_gruppo_utenti( $user ) {
 		<tr>
 			<th><label for="gruppo">Gruppo Utente</label></th>
 			<td>
-			<select name="gruppo" id="gruppo">
+<?php	     if (current_user_can('create_users'))
+     	{
+?>			<select name="gruppo" id="gruppo">
 				<option value="0">Non Assegnato</option>
 			<?php
 				foreach($gruppi as $K=>$gruppo){
@@ -55,13 +57,20 @@ function visualizza_gruppo_utenti( $user ) {
 			?>
 				</select>
 				<span class="description">Per favore seleziona il gruppo di appartenenza dell'utente.</span>
+<?php
+		}else
+			foreach($gruppi as $K=>$gruppo){
+				if ($K==$GruppoUtente) 
+					echo $gruppo."\n";
+			}
+?>
 			</td>
 		</tr>
 	</table>
 <?php }
 
 function gruppi_add_user_columns( $defaults ) {
-     $defaults['gruppo'] = "Gruppo";
+ 	$defaults['gruppo'] = "Gruppo";
      return $defaults;
 }
 function gruppi_add_custom_user_columns($value, $column_name, $id) {
