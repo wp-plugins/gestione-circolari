@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 4.0
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,10 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 2.2.2 =
+- <strong>Sistemato</strong> errore che posizionava le circolari firmate dopo la scadenza nella cartella delle circolari scadute e non firmate 
+- <strong>Modificato</strong> il comportamente della creazione della lista delle circolari lato pubblico. Quando si naviga senza essere loggati le circolari private non vengono più visualizzate nella lista
+- <strong>Disattivata Momentaneamente</strong> la notifica del numero di circolari da firmare nella Barra degli strumenti e nel menu delle Circolari. Questa notifica rallenta il BackEnd del sito e verrà rivista al più presto con relativa ottimizzazione complessiva del codice.
 = 2.2.1 =
 - <strong>Sistemato</strong> errore che permetteva agli utenti di modificarsi il gruppo di appartenenza 
 = 2.2 =

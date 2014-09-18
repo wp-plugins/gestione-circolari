@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.2.1
+ * @ver 2.2.2
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -89,7 +89,10 @@ function Is_Circolare_Scaduta($IDCircolare){
 function Get_scadenzaCircolare($ID,$TipoRet="Data",$Giorni=False){
 	$Scadenza=get_post_meta( $ID, "_scadenza",true);
 	if (!$Scadenza){
-		$Scadenza=date("Y-m-d");		if ($Giorni){			return -1;		}
+		$Scadenza=date("Y-m-d");		
+		if ($Giorni){
+			return -1;		
+		}
 	}
 	if ($Giorni){
 //		echo "in giorni ";
@@ -106,7 +109,7 @@ function Get_scadenzaCircolare($ID,$TipoRet="Data",$Giorni=False){
 function Is_Circolare_Firmata($IDCircolare){
 	global $wpdb, $current_user;
 	get_currentuserinfo();
-	if (!Is_Circolare_Da_Firmare($IDCircolare))
+	if (!Is_Circolare_Da_Firmare($IDCircolare,TRUE))
 		return FALSE;
 	$ris=$wpdb->get_results("SELECT * FROM $wpdb->table_firme_circolari WHERE post_ID=$IDCircolare AND user_ID=$current_user->ID;");
 /*	echo "SELECT * FROM $wpdb->table_firme_circolari WHERE post_ID=$IDCircolare AND user_ID=$current_user->ID;";

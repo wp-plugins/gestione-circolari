@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.2.1
+Version:2.2.2
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -59,9 +59,17 @@ add_filter('manage_posts_columns', 'circolari_NuoveColonne');
 add_action('manage_posts_custom_column', 'circolari_NuoveColonneContenuto', 10, 2); 
 add_action( 'admin_menu', 'circolari_add_menu' ); 
 add_action('init', 'update_Impostazioni_Circolari');
-add_action( 'contextual_help', 'Help_Circolari', 10, 3 );
-add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
-add_action( 'admin_menu', 'add_circolari_menu_bubble' );
+//add_action( 'contextual_help', 'Help_Circolari', 10, 3 );
+/**
+* *************************************************
+* 
+* Disattivate le notifiche per rallentamento BackEnd
+*/
+//add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
+//add_action( 'admin_menu', 'add_circolari_menu_bubble' );
+/**
+* *************************************************
+*/
 register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
 add_filter( 'the_content', 'vis_firma');

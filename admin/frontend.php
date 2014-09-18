@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 2.2.1
+ * @since 2.2.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -33,20 +33,35 @@ elseif(isset($_REQUEST['Anno']))
 	$mesecorrente="";
 else
 	$mesecorrente=date('n');
-$args = array( 'category' => $IdCircolari,
-		       'post_type' => array('post','circolari'),
-			   'year' => $annocorrente,
-			   'year' => $annocorrente,
-			   'monthnum' => $mesecorrente,
-			   'posts_per_page'  => -1,
-			   'post_status' => 'publish');
+if (is_user_logged_in() )
+	$args = array( 'category' => $IdCircolari,
+			       'post_type' => array('post','circolari'),
+				   'year' => $annocorrente,
+				   'monthnum' => $mesecorrente,
+				   'posts_per_page'  => -1,
+				   'post_status' => 'publish');
+else
+	$args = array( 'category' => $IdCircolari,
+			       'post_type' => array('post','circolari'),
+				   'year' => $annocorrente,
+				   'monthnum' => $mesecorrente,
+				   'posts_per_page'  => -1,
+				   'post_status' => 'publish',
+			   	   'meta_key'=>'_visibilita','meta_value'=>"p");
 $Circolari = get_posts($args);
 if (empty($Circolari)){
 	$Contenuto.='<h3>Non risultano circolari per '.circ_MeseLettere($mesecorrente).' '.$annocorrente.' verranno visualizzate le ultime 5</h3>';
-	$args = array( 'category' => $IdCircolari,
+	if (is_user_logged_in() )
+		$args = array( 'category' => $IdCircolari,
 		       'post_type' => array('post','circolari'),
 			   'posts_per_page'  => 5,
 			   'post_status' => 'publish');
+	else
+		$args = array( 'category' => $IdCircolari,
+		       'post_type' => array('post','circolari'),
+			   'posts_per_page'  => 5,
+			   'post_status' => 'publish',
+			   	   'meta_key'=>'_visibilita','meta_value'=>"p");	
 	$Circolari = get_posts($args);
 }
 $Contenuto.=' <div>';
