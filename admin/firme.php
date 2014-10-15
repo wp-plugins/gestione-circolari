@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.2.2
+ * @ver 2.3
  */
 
 function circolari_VisualizzaFirmate()
@@ -39,6 +39,7 @@ function circolari_VisualizzaFirmate()
 			</tfoot>
 			<tboby>';
 	foreach($Posts as $post){
+	//print_r($post);
 		$Adesione=get_post_meta($post->ID, "_sciopero");
 		$firma=get_post_meta($post->ID, "_firma");
 		$TipoCircolare="Circolare";
@@ -61,7 +62,7 @@ function circolari_VisualizzaFirmate()
 			}
 		}	
 //		setup_postdata($post);
-		$dati_firma=get_Firma_Circolare($post->ID);
+//		$dati_firma=get_Firma_Circolare($post->ID);
 		echo "
 				<tr>
 					<td> ".GetNumeroCircolare($post->ID)."</td>
@@ -72,7 +73,7 @@ function circolari_VisualizzaFirmate()
 					</td>
 					<td>$TipoCircolare</td>
 					<td>$Campo_Firma</td>
-					<td>$dati_firma->datafirma</td>
+					<td>$post->datafirma</td>
 				</tr>";
 	}	
 	echo '
@@ -177,8 +178,13 @@ function VisualizzaTabellaCircolari(){
 			$firma=get_post_meta($post->ID, "_firma");
 			$BaseUrl=admin_url()."edit.php";
 			$Scadenza=Get_scadenzaCircolare($post->ID,"DataDB");
-			$seconds_diff = strtotime($Scadenza) - strtotime(date("Y-m-d"));
-			$GGDiff=floor($seconds_diff/3600/24);
+			if ($Scadenza=="9999-12-31")
+				$GGDiff=9999;
+			else{
+				$seconds_diff = strtotime($Scadenza) - strtotime(date("Y-m-d"));
+				$GGDiff=floor($seconds_diff/3600/24);
+				
+			}
 			switch ($GGDiff){
 				case ($GGDiff <3):
 					$BGC="color: Red;";

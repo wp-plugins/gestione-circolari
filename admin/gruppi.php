@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.2.2
+ * @ver 2.3
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
@@ -13,6 +13,7 @@ if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) {
 }
 
 //Gestione Gruppi Utenti
+add_action( 'init', 'Crea_tassonomia_GruppoUtenti');
 add_filter('manage_users_sortable_columns', 'gruppi_user_sortable_columns' );
 add_filter('request', 'gruppi_user_column_orderby' );
 add_action('manage_users_custom_column', 'gruppi_add_custom_user_columns', 15, 3);
@@ -105,7 +106,6 @@ function gruppi_user_column_orderby( $vars ) {
 * Tassonomia personalizzata Gruppi Utenti
 * 
 */
-add_action( 'init', 'Crea_tassonomia_GruppoUtenti');
 function Crea_tassonomia_GruppoUtenti() 
 {
 	 register_taxonomy(

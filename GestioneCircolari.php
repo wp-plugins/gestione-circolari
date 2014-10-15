@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.2.2
+Version:2.3
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -50,7 +50,6 @@ switch ($_REQUEST["op"]){
 if ($_GET['update'] == 'true')
 	$stato="<div id='setting-error-settings_updated' class='updated settings-error'> 
 			<p><strong>Impostazioni salvate.</strong></p></div>";
-
 add_action('init', 'crea_custom_circolari');
 add_filter( 'post_updated_messages', 'circolari_updated_messages');
 add_action( 'save_post', 'circolari_salva_dettagli');
@@ -59,6 +58,7 @@ add_filter('manage_posts_columns', 'circolari_NuoveColonne');
 add_action('manage_posts_custom_column', 'circolari_NuoveColonneContenuto', 10, 2); 
 add_action( 'admin_menu', 'circolari_add_menu' ); 
 add_action('init', 'update_Impostazioni_Circolari');
+add_action('publish_circolari','AC_OnPublishPost' );
 //add_action( 'contextual_help', 'Help_Circolari', 10, 3 );
 /**
 * *************************************************
@@ -66,7 +66,7 @@ add_action('init', 'update_Impostazioni_Circolari');
 * Disattivate le notifiche per rallentamento BackEnd
 */
 //add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
-//add_action( 'admin_menu', 'add_circolari_menu_bubble' );
+add_action( 'admin_menu', 'add_circolari_menu_bubble' );
 /**
 * *************************************************
 */
@@ -74,6 +74,7 @@ register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
 add_filter( 'the_content', 'vis_firma');
 add_shortcode('VisCircolari', 'VisualizzaCircolari');
+add_shortcode('VisCircolariHome', 'VisualizzaCircolariHome');
 add_action('wp_head', 'TestataCircolari' );
 add_action( 'admin_enqueue_scripts',  'Circoalri_Admin_Enqueue_Scripts' );
 
@@ -139,6 +140,11 @@ function VisualizzaCircolari(){
 	return $ret;
 }
 
+function VisualizzaCircolariHome(){
+require_once ( dirname (__FILE__) . '/admin/frontendhome.php' );
+return $ret;
+}
+      
 function vis_firma( $content ){
 	$PostID= get_the_ID();
 	if (post_password_required( $PostID ))
@@ -183,7 +189,7 @@ function vis_firma( $content ){
 			}	
 			$firma=get_post_meta($PostID, "_firma");
 			$BaseUrl=admin_url()."edit.php";
-			if($firma[0]=="Si"){
+			if($firma[0]=="Si" or $Adesione[0]=="Si"){
 				if (Is_Circolare_Firmata($PostID)){
 					$Campo_Firma="Firmata".$Campo_Firma_Adesione;
 				}
@@ -218,6 +224,9 @@ function circolari_activate() {
 	if(get_option('Circolari_GGScadenza')== ''||!get_option('Circolari_GGScadenza')){
 		add_option('Circolari_GGScadenza', '30');
 	}
+	if(get_option('Circolari_NrCircHome')== ''||!get_option('Circolari_NrCircHome')){
+		add_option('Circolari_NrCircHome', '0');
+	}
 	$sql = "CREATE TABLE IF NOT EXISTS ".$wpdb->table_firme_circolari." (
   			post_ID  bigint(20) NOT NULL,
   			user_ID bigint(20) NOT NULL,
@@ -230,14 +239,15 @@ function circolari_activate() {
 }
 	
 function add_circolari_menu_bubble() {
-  global $menu;
-  $NumCircolari=GetCircolariDaFirmare("N");
-  if ($NumCircolari==0)
+  global $menu,$DaFirmare;
+//	$NumCircolari=GetCircolariDaFirmare("N");
+  $DaFirmare=GetCircolariDaFirmare("N");
+  if ($DaFirmare==0)
 	return;
   $i=0;
   foreach($menu as $m){
   	if ($menu[$i][0]=="Circolari"){
-		$menu[$i][0] .= "<span class='update-plugins count-1'><span class='update-count'>$NumCircolari</span></span>";
+		$menu[$i][0] .= "<span class='update-plugins count-1'><span class='update-count'>$DaFirmare</span></span>";
 		return;
 	}
 	$i++;
@@ -245,14 +255,14 @@ function add_circolari_menu_bubble() {
 }
 
 function circolari_add_menu(){
-   add_submenu_page( 'edit.php?post_type=circolari', 'Parametri',  'Parametri', 'manage_options', 'circolari', 'circolari_MenuPagine');
+   add_submenu_page( 'edit.php?post_type=circolari', 'Parametri',  'Parametri', 'edit_published_posts', 'circolari', 'circolari_MenuPagine');
    $pageFirma=add_submenu_page( 'edit.php?post_type=circolari', 'Firma',  'Firma', 'read', 'Firma', 'circolari_GestioneFirme');
    add_action( 'admin_head-'. $pageFirma, 'TestataCircolari' );
    $pageFirmate=add_submenu_page( 'edit.php?post_type=circolari', 'Firmate',  'Firmate', 'read', 'Firmate', 'circolari_VisualizzaFirmate');
    add_action( 'admin_head-'. $pageFirmate, 'TestataCircolari' );
    $pagenFirmate=add_submenu_page( 'edit.php?post_type=circolari', 'Scadute e non Firmate', 'Scadute e non Firmate', 'read', 'non_Firmate', 'circolari_VisualizzaNonFirmate');
    add_action( 'admin_head-'. $pagenFirmate, 'TestataCircolari' );
-   $utility=add_submenu_page( 'edit.php?post_type=circolari', 'Utility',  'Utility', 'manage_options', 'Utility', 'circolari_Utility');
+   $utility=add_submenu_page( 'edit.php?post_type=circolari', 'Utility',  'Utility', 'edit_published_posts', 'Utility', 'circolari_Utility');
    add_action( 'admin_head-'. $utility, 'TestataCircolari' );
 }
 
@@ -288,7 +298,8 @@ Verifica data scadenza firma <spam style="text-align:center;font-size:1.5em;font
 	 					$Scadenza=date('Y-m-d', strtotime(substr($post->post_date_gmt,0,10). " + $GGscadenza days"));
 	 					if (update_post_meta($post->ID,"_scadenza",$Scadenza ))
 	 						$lista.= ' <img src="'.Circolari_URL.'/img/verificato.png" alt="Icona Permessi" style="display:inline;margin-left:5px;"/>';
-	 				}
+	 				}else
+	 				$lista.=" la data verrà aggiornata a:".date('Y-m-d', strtotime(substr($post->post_date_gmt,0,10). " + $GGscadenza days"));
 				$lista.= "</li>";					
 				}
 			}
@@ -297,7 +308,10 @@ Verifica data scadenza firma <spam style="text-align:center;font-size:1.5em;font
 		<ul>
 				$lista
 		</ul>";
-			echo '<p style="text-align:left;font-size:1em;font-style: italic;">Aggiorna Data entro cui firmare = Datapubblicazione + '. $GGscadenza .' giorni <spam style="text-align:center;font-size:1.5em;font-weight: bold;"> <a href="edit.php?post_type=circolari&page=Utility&action=versca&opt=aggsca">Aggiorna</a></spam>
+		if (isset($_GET['opt']) && $_GET['opt']=="aggsca")
+			echo "Aggiornamento effettuato";
+		else
+			echo '<p style="text-align:left;font-size:1em;font-style: italic;">Aggiorna la Data entro cui firmare = aggiunngendo '.$GGscadenza.' giorni alla data di pubblicazione <spam style="text-align:center;font-size:1.5em;font-weight: bold;"> <a href="edit.php?post_type=circolari&page=Utility&action=versca&opt=aggsca">Aggiorna</a></spam>
 </p>
 </div>';			
 		}else
@@ -423,6 +437,7 @@ echo '<div class="wrap">
 function circolari_Parametri(){
 	$DestTutti  =  get_option('Circolari_Visibilita_Pubblica');
 	$GiorniScadenza  =  get_option('Circolari_GGScadenza');
+	$NrCircolariHome = get_option('Circolari_NrCircHome');
 echo'
 <div class="wrap">
 	  	<img src="'.Circolari_URL.'/img/opzioni32.png" alt="Icona configurazione" style="display:inline;float:left;margin-top:10px;"/>
@@ -454,6 +469,12 @@ echo'			</td>
 				<input type="text" name="GGScadenza" id="GGScadenza" size="3" maxlength="3" value="'.$GiorniScadenza.'" />
 			</td>				
 		</tr>
+		<tr valign="top">
+			<th scope="row"><label for="NrCircHome">N. di circolari da visionare in home</label></th>
+			<td>
+				<input type="text" name="NrCircHome" id="NrCircHome" size="3" maxlength="3" value="'.$NrCircolariHome.'" />
+			</td>				
+		</tr>
 	</table>
 	    <p class="submit">
 	        <input type="submit" name="Circolari_submit_button" value="Salva Modifiche" />
@@ -467,6 +488,7 @@ function update_Impostazioni_Circolari(){
 	    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
 	    update_option('Circolari_Categoria',$_POST['Categoria'] );
 	    update_option('Circolari_GGScadenza',$_POST['GGScadenza'] );
+		update_option('Circolari_NrCircHome',$_POST['NrCircHome'] );  		
 		header('Location: '.get_bloginfo('wpurl').'/wp-admin/edit.php?post_type=circolari'); 
 	}
 }
@@ -561,14 +583,14 @@ function crea_custom_circolari() {
 // add links/menus to the admin bar
 
 function circolari_admin_bar_render() {
-	global $wp_admin_bar;
-	$NumCircolari=GetCircolariDaFirmare("N");
-	if ($NumCircolari>0)
-		$VisNumCircolari=' <span style="background-color:red;">&nbsp;'.$NumCircolari.'&nbsp;</span>';
+	global $wp_admin_bar,$DaFirmare;
+	$DaFirmare=GetCircolariDaFirmare("N");
+	if ($DaFirmare>0)
+		$VisNumCircolari=' <span style="background-color:red;">&nbsp;'.$DaFirmare.'&nbsp;</span>';
 	else
 		$VisNumCircolari="";
 	$wp_admin_bar->add_menu( array(
-		'id' => 'fc', // link ID, defaults to a sanitized title value
+		'id' => 'pluginCircoalri', // link ID, defaults to a sanitized title value
 		'title' => 'Circolari '.$VisNumCircolari, // link title
 		'href' => site_url().'/wp-admin/edit.php?post_type=circolari&page=Firma', // name of file
 		'meta' => array(  'title' => 'Circolari da Firmare' )));
@@ -615,11 +637,13 @@ function circolari_salva_dettagli( $post_id ){
 				$DestTutti=get_option('Circolari_Visibilita_Pubblica');
 				wp_set_object_terms( $post_id, (int)$DestTutti,"gruppiutenti",FALSE );
 			}
-			if ($_POST["scadenza"])
-				update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"]));
-			else{
-				update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"],get_option('Circolari_GGScadenza')));
-			}
+			if($_POST["firma"] Or $_POST["sciopero"])
+				if ($_POST["scadenza"])
+					update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"]));
+				else
+					update_post_meta( $post_id, '_scadenza', FormatDataDB( $_POST["jj"]."/".$_POST["mm"]."/".$_POST["aa"],get_option('Circolari_GGScadenza')));
+			else
+				update_post_meta( $post_id, '_scadenza', "");
 			update_post_meta( $post_id, '_numero', $_POST["numero"]);
 			update_post_meta( $post_id, '_anno', $_POST["anno"]);
 			update_post_meta( $post_id, '_firma', $_POST["firma"]);

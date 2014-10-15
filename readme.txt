@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 4.0
-Stable tag: 2.2.2
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,10 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 2.3 =
+- <strong>Sistemati</strong> diversi bug
+- <strong>Ottimizzato</strong> il codice per aumentare la velocità del sito con il plugin attivato si a nel front-end sia nel back-end
+- <strong>Aggiunto</strong>aggiunto shortcode VisualizzaCircolariHome da utilizzare nel template Pasw2013 per elencare le circolari provenienti dal plugin. Codice gentilmente fornito da Christian Ghellere
 = 2.2.2 =
 - <strong>Sistemato</strong> errore che posizionava le circolari firmate dopo la scadenza nella cartella delle circolari scadute e non firmate 
 - <strong>Modificato</strong> il comportamente della creazione della lista delle circolari lato pubblico. Quando si naviga senza essere loggati le circolari private non vengono più visualizzate nella lista
