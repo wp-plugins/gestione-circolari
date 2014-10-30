@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 4.0
-Stable tag: 2.3.2
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,7 +42,11 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
-= 2.3.1 =
+= 2.4 =
+- <strong>Corretto</strong> il warning generato in visualizzazione firme nel caso in cui non sono state codificate circolari
+- <strong>Sostituito</strong> il set di icone, sono state adottate sia nel ForntEnd che nel BackEnd icone falt in bianco e nero
+- <strong>Risolto</strong> problema di visualizzazione dell'elenco circolari
+= 2.3.2 =
 - <strong>Risolto</strong> conflitto con Wordfence Security delle TableTools
 = 2.3.1 =
 - <strong>Sistemati</strong> bug: link dai widget per la firma

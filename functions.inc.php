@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.3.2
+ * @ver 2.4
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -182,10 +182,17 @@ function GetCircolariFirmate($Tipo="N"){
 	}
 	return $Circolari;
 */
-	if ($Tipo=="N")
-		return count($ris);
-	else	
-		return $ris;
+	if (empty($ris)){
+		if ($Tipo=="N")
+			return 0;
+		else
+			return array();		
+	}else{
+		if ($Tipo=="N")
+			return count($ris);
+		else	
+			return $ris;		
+	}
 }
 
 function GetCircolariDaFirmare($Tipo="N"){
@@ -205,8 +212,6 @@ function GetCircolariDaFirmare($Tipo="N"){
             GROUP BY ID";
 //    echo $Sql;
 	$ris= $wpdb->get_results($Sql);
-	if (empty($ris))
-		return 0;	
 	if ($Tipo=="N")
 		$Circolari=0;
 	else
@@ -264,8 +269,6 @@ function GetCircolariNonFirmate($Tipo="N"){
             GROUP BY ID";
 //    echo $Sql;
 	$ris= $wpdb->get_results($Sql);
-	if (empty($ris))
-		return 0;	
 	if ($Tipo=="N")
 		$Circolari=0;
 	else
