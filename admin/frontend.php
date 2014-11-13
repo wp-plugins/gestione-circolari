@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 2.4.1
+ * @since 2.4.2
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
@@ -65,14 +65,14 @@ foreach($Circolari as $post) {
 			$Elenco=substr($Elenco,0,strlen($Elenco)-3);
 		}
 		$Contenuto.='
-		<div style="margin-bottom:5px;padding:3px;vertical-align: middle;">';
+		<div style="padding:3px;">';
 		$numero=get_post_meta($post->ID, "_numero",TRUE);
 		$anno=get_post_meta($post->ID, "_anno",TRUE);
 		$Contenuto.='
 			<h4><a href="'.get_permalink($post->ID).'">'.$post->post_title.'</a>
 			</h4>
-			<div style="font-weight: bold;font-size:0.8em;margin-top:3px;">Del '.FormatDataItaliano($post->post_date).' Numero '.$numero.'_'.$anno.'</div> 
-			<div style="height:30px;">
+			<div style="font-weight: bold;font-size:0.8em;">Del '.FormatDataItaliano($post->post_date).' Numero '.$numero.'_'.$anno.'</div> 
+			<div style="min-height:30px;margin-top:5px;margin-bottom:5px; padding: 5px 3px;">
 					<img src="'.Circolari_URL.'img/tipo.png" style="border:0;" alt="Icona tipo post" />
 					<p style="font-style:italic;font-size:0.8em;display:inline;margin-top:3px;">'.$post->post_type.'</p>';	
 		if ($post->post_type=="circolari")

@@ -3,7 +3,7 @@ Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
 Tested up to: 4.0
-Stable tag: 2.4.1
+Stable tag: 2.4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 2.4.2 =
+- <strong>Sistemata</strong> la visualizzazione dei parametri delle circolari nell'elenco del FrontEnd
 = 2.4.1 =
 - <strong>Corretta</strong> la cancellazione del gruppo che si verificava quando un utente aggiornava il proprio profilo
 = 2.4 =
