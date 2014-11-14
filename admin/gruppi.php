@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.4.2
+ * @ver 2.4.3
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
@@ -83,7 +83,7 @@ function gruppi_add_custom_user_columns($value, $column_name, $id) {
 	  	else
 	  		$IDGruppo[]=$IDG;
 //	  	echo "U=".$id." - g=".get_the_author_meta( 'gruppo', $id )."<br />";
-		$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => TRUE,'include'=>$IDGruppo));
+		$gruppiutenti=get_terms('gruppiutenti', array('hide_empty' => FALSE,'include'=>$IDGruppo));
 		return $gruppiutenti[0]->name;
       }
  }
