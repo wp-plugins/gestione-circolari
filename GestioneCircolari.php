@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.4.3
+Version:2.4.4
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -23,7 +23,6 @@ License: GPL2
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
   die('You are not allowed to call this page directly.'); 
 }
-
 define("Circolari_URL",plugin_dir_url(dirname (__FILE__).'/circolari.php'));
 define("Circolari_DIR",dirname (__FILE__));
 global $wpdb,$table_prefix;
@@ -35,19 +34,21 @@ include_once(Circolari_DIR."/GestioneCircolari.widget.php");
 include_once(Circolari_DIR."/GestioneNavigazioneCircolari.widget.php");
 $msg="";
 require_once(ABSPATH . 'wp-includes/pluggable.php'); 
-
-switch ($_REQUEST["op"]){
-	case "Firma":
-		global $msg;
-		$msg=FirmaCircolare($_REQUEST["pid"],-1,$_REQUEST["dest"]);
-		break;
-	case "Adesione":
-		global $msg;
-		$msg=FirmaCircolare($_REQUEST["pid"],$_REQUEST["scelta"],$_REQUEST["dest"]);
-		break;	
+if(isset($_REQUEST["op"])){
+	switch ($_REQUEST["op"]){
+		case "Firma":
+			global $msg;
+			$msg=FirmaCircolare($_REQUEST["pid"],-1,$_REQUEST["dest"]);
+			break;
+		case "Adesione":
+			global $msg;
+			$msg=FirmaCircolare($_REQUEST["pid"],$_REQUEST["scelta"],$_REQUEST["dest"]);
+			break;	
+	}
+	
 }
 
-if ($_GET['update'] == 'true')
+if (isset($_GET['update']) And $_GET['update'] == 'true')
 	$stato="<div id='setting-error-settings_updated' class='updated settings-error'> 
 			<p><strong>Impostazioni salvate.</strong></p></div>";
 add_action('init', 'crea_custom_circolari');
@@ -65,14 +66,15 @@ add_action('publish_circolari','AC_OnPublishPost' );
 * 
 * Disattivate le notifiche per rallentamento BackEnd
 */
-//add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
+add_action( 'wp_before_admin_bar_render', 'circolari_admin_bar_render' );
 add_action( 'admin_menu', 'add_circolari_menu_bubble' );
 /**
 * *************************************************
 */
 register_uninstall_hook(__FILE__,  'circolari_uninstall' );
 register_activation_hook( __FILE__,  'circolari_activate');
-add_filter( 'the_content', 'vis_firma');
+add_filter( 'the_content', 'FiltroVisualizzaCircolare');
+add_filter( 'get_the_excerpt', 'FiltroVisualizzaRiassuntoCircolare' );
 add_shortcode('VisCircolari', 'VisualizzaCircolari');
 add_shortcode('VisCircolariHome', 'VisualizzaCircolariHome');
 add_action('wp_head', 'TestataCircolari' );
@@ -146,16 +148,38 @@ require_once ( dirname (__FILE__) . '/admin/frontendhome.php' );
 return $ret;
 }
       
-function vis_firma( $content ){
+function FiltroVisualizzaCircolare( $content ){
 	$PostID= get_the_ID();
-	if (post_password_required( $PostID ))
-		return $content;
-
-	$Campo_Firma="";
+/*
+ * Se l'articolo non appartiene al CustomPostType Circolari rimando il contenuto
+ */
 	if (get_post_type( $PostID) !="circolari")
 		return $content;
-	if (!is_user_logged_in())
+/*
+ * Se l'articolo richiede la password rimando tutto il contenuto con la richiesta della password
+ */
+	if (post_password_required( $PostID ))
 		return $content;
+/*
+ * Se non c'è un utente loggato verifico se la circolare è pubblica. 
+ * Se è pubblica la rimando per la visualizzazione
+ * Altrimenti rimando il messaggio di risorsa riservata
+ */
+	$visibilita=get_post_meta($PostID, "_visibilita");
+	if (count($visibilita)==0)
+		$selp="Pb";
+	else 
+		if ($visibilita[0]=="p")
+			$selp="Pb";
+		else	
+			$seld="Pr";
+	if ((!is_user_logged_in() Or !Is_Circolare_per_User($PostID)) And $seld=="Pr")	
+		return "<p>Circolare riservata a specifici gruppi di utenti registrati,<br />Loggati per accedere alla circolare</p>";
+/*
+ * Se la circoalre è per l'utente ed è da firmare visualizzo la gestione della firma 
+ * 
+ * Altrimenti rimando il messaggio di risorsa riservata
+ */
 	if (!Is_Circolare_Da_Firmare($PostID) or !Is_Circolare_per_User($PostID))
 		return $content;
 	if (strlen(stristr($_SERVER["HTTP_REFERER"],"wp-admin/edit.php?post_type=circolari&page=Firma"))>0)
@@ -170,6 +194,7 @@ function vis_firma( $content ){
  border: solid 1px #0076a3;
  background: #0095cd;' onclick='javascript:history.back()'>Torna alla Firma</button>".$content;
 	else{
+		$Campo_Firma="";
 		$Adesione=get_post_meta($PostID, "_sciopero");
 		if (Is_Circolare_per_User($PostID)){
 			$TipoCircolare="Circolare";
@@ -214,6 +239,38 @@ function vis_firma( $content ){
 		return $content." <br /><div style='border: solid 1px #0076a3; background: #c6d7f2;padding: 5px;'>".$Campo_Firma."</div>";
 	}
 }
+
+function FiltroVisualizzaRiassuntoCircolare( $excerpt ){
+	$PostID= get_the_ID();
+/*
+ * Se l'articolo richiede la password rimando tutto il contenuto con la richiesta della password
+ */
+	if (post_password_required( $PostID ))
+		return "Contenuto protetto da Password";
+/*
+ * Se l'articolo non appartiene al CustomPostType Circolari rimando il contenuto
+ */
+	if (get_post_type( $PostID) !="circolari")
+		return $excerpt;
+/*
+ * Se non c'è un utente loggato verifico se la circolare è pubblica. 
+ * Se è pubblica la rimando per la visualizzazione
+ * Altrimenti rimando il messaggio di risorsa riservata
+ */
+	$visibilita=get_post_meta($PostID, "_visibilita");
+	if (count($visibilita)==0)
+		$selp="Pb";
+	else 
+		if ($visibilita[0]=="p")
+			$selp="Pb";
+		else	
+			$seld="Pr";
+	if ((!is_user_logged_in() Or !Is_Circolare_per_User($PostID)) And $seld=="Pr")	
+		return "Contenuto riservato a specifici gruppi di utenti registrati";
+	else
+		return $excerpt;
+//	return $excerpt;
+}
 function circolari_activate() {
 	global $wpdb;
 	if(get_option('Circolari_Visibilita_Pubblica')== ''||!get_option('Circolari_Visibilita_Pubblica')){
@@ -242,7 +299,7 @@ function circolari_activate() {
 function add_circolari_menu_bubble() {
   global $menu,$DaFirmare;
 //	$NumCircolari=GetCircolariDaFirmare("N");
-  $DaFirmare=GetCircolariDaFirmare("N");
+$DaFirmare=GetCircolariDaFirmare("N");
   if ($DaFirmare==0)
 	return;
   $i=0;
@@ -485,7 +542,7 @@ echo'			</td>
 }
 
 function update_Impostazioni_Circolari(){
-    if($_POST['Circolari_submit_button'] == 'Salva Modifiche'){
+    if(isset($_POST['Circolari_submit_button']) And $_POST['Circolari_submit_button'] == 'Salva Modifiche'){
 	    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
 	    update_option('Circolari_Categoria',$_POST['Categoria'] );
 	    update_option('Circolari_GGScadenza',$_POST['GGScadenza'] );
@@ -585,7 +642,8 @@ function crea_custom_circolari() {
 
 function circolari_admin_bar_render() {
 	global $wp_admin_bar,$DaFirmare;
-	$DaFirmare=GetCircolariDaFirmare("N");
+	if (!isset($DaFirmare))
+		$DaFirmare=GetCircolariDaFirmare("N");
 	if ($DaFirmare>0)
 		$VisNumCircolari=' <span style="background-color:red;">&nbsp;'.$DaFirmare.'&nbsp;</span>';
 	else
