@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.4.4
+Version:2.4.5
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -394,7 +394,7 @@ jQuery.noConflict();
 						s="Presa Visione";
 						break;
 				}
-			var answer = confirm("Circolare "+$(this).attr('rel') +"\nConfermi la scelta:\n\n   " + s +"\n\nAllo sciopero?")
+			var answer = confirm("Circolare "+$(this).attr('rel') +"\nConfermi la scelta:\n\n   " + s +"?")
 			if (answer){
 				return true;
 			}
@@ -703,11 +703,11 @@ function circolari_salva_dettagli( $post_id ){
 					update_post_meta( $post_id, '_scadenza', FormatDataDB( $_POST["jj"]."/".$_POST["mm"]."/".$_POST["aa"],get_option('Circolari_GGScadenza')));
 			else
 				update_post_meta( $post_id, '_scadenza', "");
-			update_post_meta( $post_id, '_numero', $_POST["numero"]);
-			update_post_meta( $post_id, '_anno', $_POST["anno"]);
-			update_post_meta( $post_id, '_firma', $_POST["firma"]);
-			update_post_meta( $post_id, '_sciopero', $_POST["sciopero"]);
-			update_post_meta( $post_id, '_visibilita', $_POST["visibilita"]);
+			if (isset($_POST["numero"]))  update_post_meta( $post_id, '_numero', $_POST["numero"]);
+			if (isset($_POST["anno"])) update_post_meta( $post_id, '_anno', $_POST["anno"]);
+			if (isset($_POST["firma"])) update_post_meta( $post_id, '_firma', $_POST["firma"]);
+			if (isset($_POST["sciopero"])) update_post_meta( $post_id, '_sciopero', $_POST["sciopero"]);
+			if (isset($_POST["visibilita"])) update_post_meta( $post_id, '_visibilita', $_POST["visibilita"]);
 
 		}
 }

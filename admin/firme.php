@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.4.4
+ * @ver 2.4.5
  */
 
 function circolari_VisualizzaFirmate()

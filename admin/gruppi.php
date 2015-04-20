@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.4.4
+ * @ver 2.4.5
  */
  
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { 
@@ -26,8 +26,9 @@ add_action( 'edit_user_profile_update', 'memorizza_gruppo_utenti' );
 function memorizza_gruppo_utenti( $user_id ) {
 	if ( !current_user_can( 'edit_user', $user_id ) )
 		return false;
-	if ($_POST['gruppo'])
+	if (isset($_POST['gruppo'])){
 		update_usermeta( $user_id, 'gruppo', $_POST['gruppo'] );
+	}
 }
 
 function visualizza_gruppo_utenti( $user ) { 
