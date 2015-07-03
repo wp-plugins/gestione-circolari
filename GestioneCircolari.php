@@ -3,7 +3,7 @@
 Plugin Name:Gestione Circolari
 Plugin URI: http://www.sisviluppo.info
 Description: Plugin che implementa la gestione delle circolari scolastiche
-Version:2.4.5
+Version:2.5
 Author: Scimone Ignazio
 Author URI: http://www.sisviluppo.info
 License: GPL2
@@ -35,17 +35,18 @@ include_once(Circolari_DIR."/GestioneNavigazioneCircolari.widget.php");
 $msg="";
 require_once(ABSPATH . 'wp-includes/pluggable.php'); 
 if(isset($_REQUEST["op"])){
-	switch ($_REQUEST["op"]){
-		case "Firma":
-			global $msg;
-			$msg=FirmaCircolare($_REQUEST["pid"],-1,$_REQUEST["dest"]);
-			break;
-		case "Adesione":
-			global $msg;
-			$msg=FirmaCircolare($_REQUEST["pid"],$_REQUEST["scelta"],$_REQUEST["dest"]);
-			break;	
-	}
-	
+	if (isset($_REQUEST['circoFir'])) 
+		if (wp_verify_nonce($_REQUEST['circoFir'],'FirmaCircolare'))
+			switch ($_REQUEST["op"]){
+				case "Firma":
+					global $msg;
+					$msg=FirmaCircolare((int)$_REQUEST["pid"],-1);
+					break;
+				case "Adesione":
+					global $msg;
+					$msg=FirmaCircolare((int)$_REQUEST["pid"],$_REQUEST["scelta"]);
+					break;	
+			}	
 }
 
 if (isset($_GET['update']) And $_GET['update'] == 'true')
@@ -227,11 +228,12 @@ function FiltroVisualizzaCircolare( $content ){
 						<input type="radio" name="scelta" class="s1-'.$PostID.'" value="1"/>Si 
 						<input type="radio" name="scelta" class="s2-'.$PostID.'" value="2"/>No 
 						<input type="radio" name="scelta" class="s3-'.$PostID.'" value="3" checked="checked"/>Presa Visione
+						<input type="hidden" name="circoFir" value="'.wp_create_nonce('FirmaCircolare').'" />
 						<input type="submit" name="inviaadesione" class="button inviaadesione" id="'.$PostID.'" value="Firma" rel="'.get_the_title($PostID).'"/>
 					</form>';
 
 					}else
-						$Campo_Firma='<a href="?op=Firma&pid='.$PostID.'">Firma Circolare</a>';
+						$Campo_Firma='<a href="?op=Firma&pid='.$PostID.'&circoFir='.wp_create_nonce('FirmaCircolare').'">Firma Circolare</a>';
 				}
 				$dati_firma=get_Firma_Circolare($PostID);
 			}	
@@ -411,13 +413,13 @@ jQuery.noConflict();
 function circolari_MenuPagine(){
 	switch ($_REQUEST["op"]){
 		case "Firme":
-			circolari_VisualizzaFirme($_REQUEST["post_id"]);
+			circolari_VisualizzaFirme((int)$_REQUEST["post_id"]);
 			break;
 		case "Adesioni":
-			circolari_VisualizzaFirme($_REQUEST["post_id"],1);
+			circolari_VisualizzaFirme((int)$_REQUEST["post_id"],1);
 			break;
 		case "email":
-			circolari_SpostainNewsletter($_REQUEST["post_id"]);
+			circolari_SpostainNewsletter((int)$_REQUEST["post_id"]);
 			break;
 		default:
 			circolari_Parametri();	
@@ -501,6 +503,7 @@ echo'
 	  	<img src="'.Circolari_URL.'/img/opzioni32.png" alt="Icona configurazione" style="display:inline;float:left;margin-top:10px;"/>
 	  	<h2 style="margin-left:40px;">Configurazione Circolari</h2>
 	  <form name="Circolari_cnf" action="'.get_bloginfo('wpurl').'/wp-admin/index.php" method="post">
+	  <input type="hidden" name="circoPar" value="'.wp_create_nonce('ParametriCircolare').'" />
 	  <table class="form-table">
 		<tr valign="top">
 			<th scope="row"><label for="pubblica">Gruppo Pubblico Circolari</label></th>
@@ -542,12 +545,16 @@ echo'			</td>
 }
 
 function update_Impostazioni_Circolari(){
-    if(isset($_POST['Circolari_submit_button']) And $_POST['Circolari_submit_button'] == 'Salva Modifiche'){
-	    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
-	    update_option('Circolari_Categoria',$_POST['Categoria'] );
-	    update_option('Circolari_GGScadenza',$_POST['GGScadenza'] );
-		update_option('Circolari_NrCircHome',$_POST['NrCircHome'] );  		
-		header('Location: '.get_bloginfo('wpurl').'/wp-admin/edit.php?post_type=circolari'); 
+    if(isset($_POST['Circolari_submit_button']) And 
+       $_POST['Circolari_submit_button'] == 'Salva Modifiche'){
+       	if (isset($_REQUEST['circoPar'])) 
+			if (wp_verify_nonce($_REQUEST['circoPar'],'ParametriCircolare')){
+			    update_option('Circolari_Visibilita_Pubblica',$_POST['pubblica'] );
+			    update_option('Circolari_Categoria',(int)$_POST['Categoria'] );
+			    update_option('Circolari_GGScadenza',(int)$_POST['GGScadenza'] );
+				update_option('Circolari_NrCircHome',(int)$_POST['NrCircHome'] );  		
+				header('Location: '.get_bloginfo('wpurl').'/wp-admin/edit.php?post_type=circolari'); 
+			}
 	}
 }
 
@@ -700,11 +707,11 @@ function circolari_salva_dettagli( $post_id ){
 				if ($_POST["scadenza"])
 					update_post_meta( $post_id, '_scadenza', FormatDataDB($_POST["scadenza"]));
 				else
-					update_post_meta( $post_id, '_scadenza', FormatDataDB( $_POST["jj"]."/".$_POST["mm"]."/".$_POST["aa"],get_option('Circolari_GGScadenza')));
+					update_post_meta( $post_id, '_scadenza', FormatDataDB( (int)$_POST["jj"]."/".(int)$_POST["mm"]."/".(int)$_POST["aa"],get_option('Circolari_GGScadenza')));
 			else
 				update_post_meta( $post_id, '_scadenza', "");
-			if (isset($_POST["numero"]))  update_post_meta( $post_id, '_numero', $_POST["numero"]);
-			if (isset($_POST["anno"])) update_post_meta( $post_id, '_anno', $_POST["anno"]);
+			if (isset($_POST["numero"]))  update_post_meta( $post_id, '_numero', (int)$_POST["numero"]);
+			if (isset($_POST["anno"])) update_post_meta( $post_id, '_anno', (int)$_POST["anno"]);
 			if (isset($_POST["firma"])) update_post_meta( $post_id, '_firma', $_POST["firma"]);
 			if (isset($_POST["sciopero"])) update_post_meta( $post_id, '_sciopero', $_POST["sciopero"]);
 			if (isset($_POST["visibilita"])) update_post_meta( $post_id, '_visibilita', $_POST["visibilita"]);
@@ -744,7 +751,14 @@ $numero=get_post_meta($post->ID, "_numero");
 $anno=get_post_meta($post->ID, "_anno");
 $anno=$anno[0];
 $numero=$numero[0];
-if ($anno=="" or !$anno){	$anno=date("Y");	$canno=strval(date("y"))+1;	if (date("n")>8)		$anno=$anno."/".$canno;	else			$anno=($anno-1)."/".date("y");}
+if ($anno=="" or !$anno){	
+	$anno=date("Y");	
+	$canno=strval(date("y"))+1;	
+	if (date("n")>8)		
+		$anno=$anno."/".$canno;	
+	else			
+		$anno=($anno-1)."/".date("y");
+}
 if ($numero=="" or !$numero)
 	$numero=NewNumCircolare($anno);
 echo '<label>Numero/Anno</label>

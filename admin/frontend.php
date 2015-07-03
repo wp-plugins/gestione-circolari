@@ -5,18 +5,18 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @since 2.4.5
+ * @since 2.5
  */
 
 if(preg_match('#' . basename(__FILE__) . '#', $_SERVER['PHP_SELF'])) { die('You are not allowed to call this page directly.'); }
 
 if (isset($_REQUEST['anno']))
-	$Anno=$_REQUEST['anno'];
+	$Anno=(int)$_REQUEST['anno'];
 else
 	$Anno=date("Y");
 $Mese=0;
 if (isset($_REQUEST['mese']))
-	$Mese=$_REQUEST['mese'];
+	$Mese=(int)$_REQUEST['mese'];
 $ret=Lista_Circolari($Anno,$Mese);
 
 function Lista_Circolari($Anno,$Mese){
@@ -24,11 +24,11 @@ $Contenuto="";
 $IdCircolari=get_option('Circolari_Categoria');
 $mesecorrente = date('n');
 if (isset($_REQUEST['Anno']))
-	$annocorrente = $_REQUEST['Anno'];
+	$annocorrente = (int)$_REQUEST['Anno'];
 else
 	$annocorrente = date('Y');
 if (isset($_REQUEST['Mese']))
-	$mesecorrente=$_REQUEST['Mese'];
+	$mesecorrente=(int)$_REQUEST['Mese'];
 elseif(isset($_REQUEST['Anno']))
 	$mesecorrente="";
 else

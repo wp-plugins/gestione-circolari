@@ -2,8 +2,8 @@
 Contributors: Scimone Ignazio
 Tags: Gestione Circolari, Scuola, Gestione Scuola
 Requires at least: 3.7
-Tested up to: 4.1
-Stable tag: 2.4.5
+Tested up to: 4.2
+Stable tag: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -42,6 +42,8 @@ Di seguito sono riportati i passi necessari per l'installazione del plugin.
 8. Visualizzazione di una circolare
 
 == Changelog ==
+= 2.5 =
+- <strong>Risolti</strong> alcuni problemi di sicurezza
 = 2.4.5 =
 - <strong>Corretto</strong> messaggio di conferma della firma in caso di sciopero/circolare sindacale adesso non riporta la dicitura <strong><em>allo sciopero</em></strong>
 = 2.4.4 =

@@ -5,7 +5,7 @@
  * @package Gestione Circolari
  * @author Scimone Ignazio
  * @copyright 2011-2014
- * @ver 2.4.5
+ * @ver 2.5
  */
 
 function circolari_VisualizzaFirmate()
@@ -201,7 +201,7 @@ function VisualizzaTabellaCircolari(){
 			}
 			//setup_postdata($post);
 			if($firma[0]=="Si")
-				$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$post->ID.'">Firma Circolare</a>';
+				$Campo_Firma='<a href="'.$BaseUrl.'?post_type=circolari&page=Firma&op=Firma&pid='.$post->ID.'&circoFir='.wp_create_nonce('FirmaCircolare').'">Firma Circolare</a>';
 			if ($Adesione[0]=="Si")			
 				$Campo_Firma='<form action="'.$BaseUrl.'"  method="get" style="display:inline;">
 					<input type="hidden" name="post_type" value="circolari" />
@@ -211,6 +211,7 @@ function VisualizzaTabellaCircolari(){
 					<input type="radio" name="scelta" class="s1-'.$post->ID.'" value="1"/>Si 
 					<input type="radio" name="scelta" class="s2-'.$post->ID.'" value="2"/>No 
 					<input type="radio" name="scelta" class="s3-'.$post->ID.'" value="3" checked="checked"/>Presa Visione
+					<input type="hidden" name="circoFir" value="'.wp_create_nonce('FirmaCircolare').'" />
 					<input type="submit" name="inviaadesione" class="button inviaadesione" id="'.$post->ID.'" value="Firma" rel="'.$post->post_title.'"/>
 				</form>';
 			echo "
